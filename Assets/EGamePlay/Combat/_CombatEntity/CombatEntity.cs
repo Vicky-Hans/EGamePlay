@@ -53,7 +53,6 @@ namespace EGamePlay.Combat
             AddComponent<AttributeComponent>().InitializeCharacter();
             AddComponent<ActionPointComponent>();
             AddComponent<AbilityComponent>();
-            //AddComponent<ConditionEventComponent>();
             AddComponent<StatusComponent>();
             AddComponent<SkillComponent>();
             AddComponent<SpellComponent>();
@@ -62,10 +61,7 @@ namespace EGamePlay.Combat
             CurrentHealth.HealthPointNumeric = GetComponent<AttributeComponent>().HealthPoint;
             CurrentHealth.HealthPointMaxNumeric = GetComponent<AttributeComponent>().HealthPointMax;
             CurrentHealth.Reset();
-
-            //AttackAbility = GetComponent<AbilityComponent>().AttachAbility<AttackAbility>(null);
-            //AttackBlockAbility = AttachAction<AttackBlockActionAbility>();
-
+            
             EffectAssignAbility = AttachAction<EffectAssignAbility>();
             SpellAbility = AttachAction<SpellActionAbility>();
             MotionAbility = AttachAction<MotionActionAbility>();

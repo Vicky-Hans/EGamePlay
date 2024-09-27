@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace EGamePlay.Combat
+﻿namespace EGamePlay.Combat
 {
     public interface IEffectTriggerSystem
     {
@@ -28,20 +23,15 @@ namespace EGamePlay.Combat
         public CombatEntity OwnerEntity => OwnerAbility.OwnerEntity;
         public Entity ParentEntity => OwnerAbility.ParentEntity;
         public Effect EffectConfig { get; set; }
-
-
         public override void Awake(object initData)
         {
-            this.EffectConfig = initData as Effect;
+            EffectConfig = initData as Effect;
             Name = EffectConfig.GetType().Name;
-            //Log.Debug($"AbilityEffect Awake {OwnerAbility.Name} {EffectConfig}");
-
-            /// 行动禁制
-            if (this.EffectConfig is ActionControlEffect) AddComponent<EffectActionControlComponent>();
-            /// 属性修饰
-            if (this.EffectConfig is AttributeModifyEffect) AddComponent<EffectAttributeModifyComponent>();
-
-            /// 伤害效果
+            //行动禁制
+            if (EffectConfig is ActionControlEffect) AddComponent<EffectActionControlComponent>();
+            //属性修饰
+            if (EffectConfig is AttributeModifyEffect) AddComponent<EffectAttributeModifyComponent>();
+            //伤害效果
             if (this.EffectConfig is DamageEffect) AddComponent<EffectDamageComponent>();
             /// 治疗效果
             if (this.EffectConfig is CureEffect) AddComponent<EffectCureComponent>();
@@ -55,21 +45,16 @@ namespace EGamePlay.Combat
             var decorators = this.EffectConfig.Decorators;
             if (decorators != null && decorators.Count > 0) AddComponent<EffectDecoratosComponent>();
         }
-
         public override void OnDestroy()
         {
             DisableEffect();
         }
-
         public void EnableEffect()
         {
             Enable = true;
             foreach (var item in Components.Values)
-            {
                 item.Enable = true;
-            }
         }
-
         public void DisableEffect()
         {
             Enable = false;

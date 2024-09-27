@@ -1,9 +1,7 @@
 ﻿namespace EGamePlay.Combat
 {
     using System;
-    using System.Collections.Generic;
     using Sirenix.OdinInspector;
-
     [LabelText("技能类型")]
     public enum SkillSpellType
     {

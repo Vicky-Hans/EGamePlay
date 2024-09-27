@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
 namespace EGamePlay.Combat
 {
@@ -11,29 +8,16 @@ namespace EGamePlay.Combat
     public class TriggerStateCheckComponent : Component
     {
         public override bool DefaultEnable { get; set; } = false;
-        public List<IStateCheck> StateChecks { get; set; } = new List<IStateCheck>();
-
-
+        private List<IStateCheck> StateChecks { get; set; } = new ();
         public override void Awake()
         {
             var effectConfig = Entity.As<AbilityTrigger>().TriggerConfig;
-            if (effectConfig.StateCheckList == null)
-            {
-                return;
-            }
+            if (effectConfig.StateCheckList == null)  return;
             foreach (var item in effectConfig.StateCheckList)
             {
-                //var type = item.Key;
-                //var typeStr = item.Key.ToString();
                 var conditionStr = item;
-                if (string.IsNullOrEmpty(conditionStr))
-                {
-                    continue;
-                }
-                if (conditionStr.StartsWith("#"))
-                {
-                    continue;
-                }
+                if (string.IsNullOrEmpty(conditionStr)) continue;
+                if (conditionStr.StartsWith("#")) continue;
                 var condition = conditionStr;
                 if (conditionStr.StartsWith("!")) condition = conditionStr.TrimStart('!');
                 var arr2 = condition.Split('<', '=', '≤');
@@ -50,52 +34,30 @@ namespace EGamePlay.Combat
                 }
             }
         }
-
         protected override void OnDestroy()
         {
             foreach (var item in StateChecks)
-            {
                 Entity.Destroy(item as Entity);
-            }
             StateChecks.Clear();
         }
-
-        protected override void OnEnable()
-        {
-
-        }
-
-        protected override void OnDisable()
-        {
-
-        }
-
+        protected override void OnEnable() { }
+        protected override void OnDisable() { }
         public bool CheckTargetState(Entity target)
         {
-            //Log.Debug("EffectTargetStateCheckComponent CheckTargetState");
-            /// 这里是状态判断，状态判断是判断目标的状态是否满足条件，满足则触发效果
+            //这里是状态判断，状态判断是判断目标的状态是否满足条件，满足则触发效果
             var conditionCheckResult = true;
             foreach (var item in StateChecks)
             {
-                //Log.Debug($"ConditionChecks {item.GetType().Name}");
-                /// 条件取反
+                //条件取反
                 if (item.IsInvert)
                 {
-                    if (item.CheckWith(target))
-                    {
-                        conditionCheckResult = false;
-                        break;
-                    }
+                    if (!item.CheckWith(target)) continue;
+                    conditionCheckResult = false;
+                    break;
                 }
-                else
-                {
-                    if (!item.CheckWith(target))
-                    {
-                        conditionCheckResult = false;
-                        break;
-                    }
-                }
-                //Log.Debug($"ConditionChecks {item.GetType().Name} true");
+                if (item.CheckWith(target)) continue;
+                conditionCheckResult = false;
+                break;
             }
             return conditionCheckResult;
         }

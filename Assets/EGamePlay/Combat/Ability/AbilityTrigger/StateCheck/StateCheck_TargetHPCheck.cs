@@ -1,8 +1,5 @@
-﻿using EGamePlay.Combat;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
+using UnityEngine;
 
 namespace EGamePlay.Combat
 {
@@ -14,8 +11,6 @@ namespace EGamePlay.Combat
         public CombatEntity OwnerBattler => Parent.GetParent<AbilityEffect>().OwnerEntity;
         public string AffectCheck { get; set; }
         public bool IsInvert => AffectCheck.StartsWith("!");
-
-
         public override void Awake(object initData)
         {
             AffectCheck = initData.ToString().ToLower();
@@ -23,11 +18,7 @@ namespace EGamePlay.Combat
 
         public bool CheckWith(Entity target)
         {
-            //Log.Debug($"ConditionTargetHPCheck CheckCondition");
-            if (target is IActionExecute combatAction)
-            {
-                target = combatAction.Target;
-            }
+            if (target is IActionExecute combatAction)  target = combatAction.Target;
             if (target is CombatEntity battler)
             {
                 var arr = AffectCheck.Split('<', '=', '≤');
@@ -35,15 +26,9 @@ namespace EGamePlay.Combat
                 formula = formula.Replace("%", $"*0.01");
                 formula = formula.Replace("TargetHPMax".ToLower(), $"{battler.GetComponent<AttributeComponent>().HealthPointMax.Value}");
                 var value = ExpressionHelper.ExpressionParser.Evaluate(formula);
-                var targetHP = battler.GetComponent<AttributeComponent>().HealthPoint.Value;
-                if (AffectCheck.Contains("<") || AffectCheck.Contains("≤"))
-                {
-                    return targetHP <= value;
-                }
-                if (AffectCheck.Contains("="))
-                {
-                    return targetHP == value;
-                }
+                var targetHp = battler.GetComponent<AttributeComponent>().HealthPoint.Value;
+                if (AffectCheck.Contains("<") || AffectCheck.Contains("≤")) return targetHp <= value;
+                if (AffectCheck.Contains("=")) return Math.Abs(targetHp - value) < Mathf.Epsilon;
             }
             Log.Debug($"ConditionTargetHPCheck CheckCondition {AffectCheck} false");
             return false;

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace EGamePlay.Combat
+﻿namespace EGamePlay.Combat
 {
     /// <summary>
     /// 能力等级组件

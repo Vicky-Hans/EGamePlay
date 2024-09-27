@@ -9,8 +9,6 @@ namespace EGamePlay.Combat
         public override bool DefaultEnable => false;
         private GameTimer NoDamageTimer { get; set; }
         private Action WhenNoDamageInTimeCallback { get; set; }
-
-
         public override void Awake(object initData)
         {
             var time = (float)initData;
@@ -18,34 +16,24 @@ namespace EGamePlay.Combat
             var combatEntity = GetEntity<AbilityTrigger>().ParentEntity;
             combatEntity.GetComponent<ActionPointComponent>().AddListener(ActionPointType.PostReceiveDamage, WhenReceiveDamage);
         }
-
         protected override void OnDestroy()
         {
             var combatEntity = GetEntity<AbilityTrigger>().ParentEntity;
             combatEntity.GetComponent<ActionPointComponent>().RemoveListener(ActionPointType.PostReceiveDamage, WhenReceiveDamage);
         }
-
         public void StartListen(Action whenNoDamageInTimeCallback)
         {
             NoDamageTimer.OnFinish(OnFinish);
             Enable = true;
-            //AddComponent<UpdateComponent>();
         }
-
         private void OnFinish()
         {
             GetEntity<AbilityTrigger>().OnTrigger(new TriggerContext());
-            //OnTrigger(GetEntity<AbilityTrigger>());
         }
-
         public override void Update()
         {
-            if (NoDamageTimer.IsRunning)
-            {
-                NoDamageTimer.UpdateAsFinish(Time.deltaTime);
-            }
+            if (NoDamageTimer.IsRunning) NoDamageTimer.UpdateAsFinish(Time.deltaTime);
         }
-
         private void WhenReceiveDamage(Entity combatAction)
         {
             NoDamageTimer.Reset();

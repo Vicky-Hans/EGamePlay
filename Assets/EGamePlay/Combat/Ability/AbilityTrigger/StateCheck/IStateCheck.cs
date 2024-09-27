@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EGamePlay.Combat
+﻿namespace EGamePlay.Combat
 {
     public interface IStateCheck
     {

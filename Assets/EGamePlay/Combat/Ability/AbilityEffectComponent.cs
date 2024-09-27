@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
+﻿using System.Collections.Generic;
 namespace EGamePlay.Combat
 {
     /// <summary>
@@ -10,17 +7,12 @@ namespace EGamePlay.Combat
     public class AbilityEffectComponent : Component
     {
         public override bool DefaultEnable { get; set; } = false;
-        public List<AbilityEffect> AbilityEffects { get; private set; } = new List<AbilityEffect>();
+        public List<AbilityEffect> AbilityEffects { get; private set; } = new ();
         public AbilityEffect DamageAbilityEffect { get; set; }
         public AbilityEffect CureAbilityEffect { get; set; }
-
-
         public override void Awake(object initData)
         {
-            if (initData == null)
-            {
-                return;
-            }
+            if (initData == null) return;
             var effects = initData as List<Effect>;
             foreach (var item in effects)
             {
@@ -37,28 +29,20 @@ namespace EGamePlay.Combat
                 }
             }
         }
-
         protected override void OnEnable()
         {
             foreach (var item in AbilityEffects)
-            {
                 item.EnableEffect();
-            }
         }
-
         protected override void OnDisable()
         {
             foreach (var item in AbilityEffects)
-            {
                 item.DisableEffect();
-            }
         }
-
-        public void AddEffect(AbilityEffect abilityEffect)
+        private void AddEffect(AbilityEffect abilityEffect)
         {
             AbilityEffects.Add(abilityEffect);
         }
-
         public AbilityEffect GetEffect(int index = 0)
         {
             return AbilityEffects[index];
