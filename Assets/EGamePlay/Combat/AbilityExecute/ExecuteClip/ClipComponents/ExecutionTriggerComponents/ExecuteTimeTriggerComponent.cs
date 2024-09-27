@@ -32,7 +32,7 @@ namespace EGamePlay.Combat
             }
         }
 
-        public override void OnEnable()
+        protected override void OnEnable()
         {
             //Log.Debug($"ExecutionTimeTriggerComponent OnEnable {TimeValueExpression} {StartTime} {EndTime}");
 

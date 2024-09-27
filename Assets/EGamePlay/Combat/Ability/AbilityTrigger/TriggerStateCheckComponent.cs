@@ -51,7 +51,7 @@ namespace EGamePlay.Combat
             }
         }
 
-        public override void OnDestroy()
+        protected override void OnDestroy()
         {
             foreach (var item in StateChecks)
             {
@@ -60,12 +60,12 @@ namespace EGamePlay.Combat
             StateChecks.Clear();
         }
 
-        public override void OnEnable()
+        protected override void OnEnable()
         {
 
         }
 
-        public override void OnDisable()
+        protected override void OnDisable()
         {
 
         }

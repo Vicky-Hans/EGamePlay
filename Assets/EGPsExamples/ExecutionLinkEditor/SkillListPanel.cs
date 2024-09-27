@@ -27,14 +27,14 @@ namespace EGamePlay
 
         public void Popup()
         {
-            var p = transform.rectTransform().anchoredPosition;
+            var p = transform.RectTransform().anchoredPosition;
             if (p.x > 1)
             {
-                transform.rectTransform().anchoredPosition = new Vector2(0, p.y);
+                transform.RectTransform().anchoredPosition = new Vector2(0, p.y);
             }
             else
             {
-                transform.rectTransform().anchoredPosition = new Vector2(transform.rectTransform().sizeDelta.x, p.y);
+                transform.RectTransform().anchoredPosition = new Vector2(transform.RectTransform().sizeDelta.x, p.y);
             }
         }
 
@@ -54,9 +54,9 @@ namespace EGamePlay
 
             var listTrm = ContentTrm;
             var itemTrm = SkillBtn.transform;
-            var trackListSize = listTrm.rectTransform().sizeDelta;
+            var trackListSize = listTrm.RectTransform().sizeDelta;
             var space = listTrm.GetComponent<VerticalLayoutGroup>().spacing;
-            listTrm.rectTransform().sizeDelta = new Vector2(trackListSize.x, listTrm.childCount * (itemTrm.rectTransform().sizeDelta.y + space));
+            listTrm.RectTransform().sizeDelta = new Vector2(trackListSize.x, listTrm.childCount * (itemTrm.RectTransform().sizeDelta.y + space));
 #endif
         }
     }

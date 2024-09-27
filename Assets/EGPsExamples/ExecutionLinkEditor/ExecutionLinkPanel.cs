@@ -1,10 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.IO;
 using EGamePlay.Combat;
-using System.Linq;
 
 namespace EGamePlay
 {
@@ -36,10 +33,6 @@ namespace EGamePlay
         public Button StepBtn;
         public Transform ContentTrm;
         public Transform Button;
-
-        //public Unit Unit { get; set; }
-        //public Unit Monster { get; set; }
-        //public CastConfig CurrentSkillConfig { get; set; }
         public int CurrentSkillId { get; set; }
         public float TotalTime { get; set; }
         public float CurrentTime { get; set; }
@@ -51,19 +44,12 @@ namespace EGamePlay
         public ExecuteClipData CurrentExecutionClip { get; set; }
         public CombatEntity HeroEntity { get; set; }
         public CombatEntity BossEntity { get; set; }
-
-
-        // Start is called before the first frame update
         void Start()
         {
             Instance = this;
 
             var r = GetComponent<RectTransform>();
             PanelWidth = Screen.width - r.offsetMin.x + r.offsetMax.x;
-            //PanelWidth = GetComponent<RectTransform>().sizeDelta.x;
-            //Log.Debug($"{GetComponent<RectTransform>().offsetMin} {GetComponent<RectTransform>().offsetMax}");
-
-            //Button.SetParent(null);
             TrackTrm.SetParent(null);
 
             FrameTextPos = FrameTextTrm.GetComponent<RectTransform>().localPosition;
@@ -82,15 +68,13 @@ namespace EGamePlay
 
             Invoke(nameof(AfterStart), 0.1f);
         }
-
         private void AfterStart()
         {
             Monster.Boss.MotionComponent.Enable = false;
             Monster.Boss.AnimationComponent.Speed = 1;
             Monster.Boss.AnimationComponent.TryPlayFade(Monster.Boss.AnimationComponent.IdleAnimation);
         }
-
-        // Update is called once per frame
+        
         void Update()
         {
             if (IsPlaying)
@@ -104,7 +88,7 @@ namespace EGamePlay
                 if (SkillTimeImage.fillAmount >= 1)
                 {
                     IsPlaying = false;
-                    PlayButton.GetComponentInChildren<Text>().text = "²¥·Å";
+                    PlayButton.GetComponentInChildren<Text>().text = "ï¿½ï¿½ï¿½ï¿½";
                 }
             }
 
@@ -114,7 +98,7 @@ namespace EGamePlay
             }
         }
 
-        public void NewExecutionAsset()
+        private void NewExecutionAsset()
         {
 #if UNITY_EDITOR
             var assetName = "Execution_";
@@ -145,7 +129,7 @@ namespace EGamePlay
 #endif
         }
 
-        public void AddClipAsset()
+        private void AddClipAsset()
         {
 #if UNITY_EDITOR
             if (string.IsNullOrEmpty(CurrentExecutionAssetPath))
@@ -166,10 +150,9 @@ namespace EGamePlay
 #endif
         }
 
-        public void DeleteClipAsset()
+        private void DeleteClipAsset()
         {
 #if UNITY_EDITOR
-            //Log.Debug($"DeleteClipAsset {CurrentExecutionClip} {CurrentExecutionObject.ExecutionClips.Count}");
             CurrentExecutionObject.ExecuteClips.Remove(CurrentExecutionClip);
             UnityEditor.AssetDatabase.RemoveObjectFromAsset(CurrentExecutionClip);
             UnityEditor.EditorUtility.SetDirty(CurrentExecutionObject);
@@ -179,30 +162,24 @@ namespace EGamePlay
 #endif
         }
 
-        public void SaveAsset()
+        private void SaveAsset()
         {
 #if UNITY_EDITOR
             if (CurrentExecutionObject == null)
             {
                 return;
             }
-            var dels = new List<UnityEngine.Object>();
+            var dels = new List<Object>();
             var assets = UnityEditor.AssetDatabase.LoadAllAssetsAtPath(CurrentExecutionAssetPath);
             foreach (var item in assets)
             {
-                if (UnityEditor.AssetDatabase.IsMainAsset(item))
-                {
-                    continue;
-                }
-                if (item is ExecuteClipData data && CurrentExecutionObject.ExecuteClips.Contains(data))
-                {
-                    continue;
-                }
+                if (UnityEditor.AssetDatabase.IsMainAsset(item)) continue;
+                if (item is ExecuteClipData data && CurrentExecutionObject.ExecuteClips.Contains(data)) continue;
                 dels.Add(item);
             }
             foreach (var item in dels)
             {
-                UnityEngine.Debug.Log($"RemoveObjectFromAsset {item.name}");
+                Debug.Log($"RemoveObjectFromAsset {item.name}");
                 UnityEditor.AssetDatabase.RemoveObjectFromAsset(item);
             }
             UnityEditor.EditorUtility.SetDirty(CurrentExecutionObject);
@@ -219,12 +196,12 @@ namespace EGamePlay
 #endif
         }
 
-        public static void DestroyChildren(Transform transform)
+        private static void DestroyChildren(Transform transform)
         {
-            for (int i = transform.childCount - 1; i >= 0; i--)
+            for (var i = transform.childCount - 1; i >= 0; i--)
             {
                 var child = transform.GetChild(i);
-                GameObject.DestroyImmediate(child.gameObject);
+                DestroyImmediate(child.gameObject);
             }
         }
 
@@ -264,42 +241,40 @@ namespace EGamePlay
                 }
             }
 
-            var trackListSize = self.TrackListTrm.rectTransform().sizeDelta;
+            var trackListSize = self.TrackListTrm.RectTransform().sizeDelta;
             var space = self.TrackListTrm.GetComponent<VerticalLayoutGroup>().spacing;
-            self.TrackListTrm.rectTransform().sizeDelta = new Vector2(trackListSize.x, self.TrackListTrm.childCount * (self.TrackTrm.rectTransform().sizeDelta.y + space));
+            self.TrackListTrm.RectTransform().sizeDelta = new Vector2(trackListSize.x, self.TrackListTrm.childCount * (self.TrackTrm.RectTransform().sizeDelta.y + space));
 
             DestroyChildren(self.FrameInfosContentTrm);
 
-            if (self.TotalTime > 0)
+            if (!(self.TotalTime > 0)) return;
+            var frameCount = (int)(self.TotalTime * 100);
+            for (var i = 0; i < frameCount; i++)
             {
-                var frameCount = (int)(self.TotalTime * 100);
-                for (int i = 0; i < frameCount; i++)
+                var frameObj = Instantiate(self.FrameTrm, self.FrameInfosContentTrm);
+                if (i % 5 != 0)
                 {
-                    var frameObj = GameObject.Instantiate(self.FrameTrm, self.FrameInfosContentTrm);
-                    if (i % 5 != 0)
+                    var c = frameObj.GetComponent<Image>().color;
+                    frameObj.GetComponent<Image>().color = new Color(c.r, c.g, c.b, .5f);
+                    var r = frameObj.RectTransform();
+                    r.sizeDelta = new Vector2(r.sizeDelta.x, r.sizeDelta.y * 0.4f);
+                }
+                else
+                {
+                    if (i % 10 != 0)
                     {
                         var c = frameObj.GetComponent<Image>().color;
-                        frameObj.GetComponent<Image>().color = new Color(c.r, c.g, c.b, .5f);
-                        var r = frameObj.rectTransform();
-                        r.sizeDelta = new Vector2(r.sizeDelta.x, r.sizeDelta.y * 0.4f);
+                        var r = frameObj.RectTransform();
+                        r.sizeDelta = new Vector2(r.sizeDelta.x, r.sizeDelta.y * 0.8f);
                     }
                     else
                     {
-                        if (i % 10 != 0)
-                        {
-                            var c = frameObj.GetComponent<Image>().color;
-                            var r = frameObj.rectTransform();
-                            r.sizeDelta = new Vector2(r.sizeDelta.x, r.sizeDelta.y * 0.8f);
-                        }
-                        else
-                        {
-                            var textObj = GameObject.Instantiate(self.FrameTextTrm, frameObj.transform);
-                            textObj.rectTransform().localPosition = self.FrameTextPos;
-                            var milis = i * 10;
-                            var secs = milis / 1000;
-                            var secs2 = milis % 1000 / 10;
-                            textObj.GetComponent<Text>().text = $"{secs}:{secs2.ToString().PadLeft(2, '0')}";
-                        }
+                        var textObj = Instantiate(self.FrameTextTrm, frameObj.transform);
+                        textObj.RectTransform().localPosition = self.FrameTextPos;
+                        var milis = i * 10;
+                        var secs = milis / 1000;
+                        var secs2 = milis % 1000 / 10;
+                        textObj.GetComponent<Text>().text = $"{secs}:{secs2.ToString().PadLeft(2, '0')}";
                     }
                 }
             }
@@ -309,8 +284,7 @@ namespace EGamePlay
         void LoadCurrentSkillCollisionClip(ExecuteClipData trackClipData)
         {
             var self = this;
-            var animTrack = GameObject.Instantiate(self.TrackTrm);
-            animTrack.SetParent(self.TrackListTrm);
+            var animTrack = Instantiate(self.TrackTrm, self.TrackListTrm, true);
             animTrack.GetComponentInChildren<Text>().text = "collision execute";
 
             trackClipData.TotalTime = self.TotalTime;
@@ -364,20 +338,15 @@ namespace EGamePlay
         {
             var self = this;
             var sound = "sound";
-            if (string.IsNullOrEmpty(sound))
-            {
-                return;
-            }
+            if (string.IsNullOrEmpty(sound)) return;
             var audio = Load<AudioClip>(sound);
-            var animTrack = GameObject.Instantiate(self.TrackTrm);
-            animTrack.SetParent(self.TrackListTrm);
+            var animTrack = Instantiate(self.TrackTrm, self.TrackListTrm, true);
             animTrack.GetComponentInChildren<Text>().text = $"{sound}";
 
-            var trackClipData = new ExecuteClipData();
+            var trackClipData = ScriptableObject.CreateInstance<ExecuteClipData>();
             trackClipData.TotalTime = self.TotalTime;
             trackClipData.ExecuteClipType = ExecuteClipType.Audio;
-            trackClipData.AudioData = new AudioData();
-            trackClipData.AudioData.AudioClip = audio;
+            trackClipData.AudioData = new AudioData {AudioClip = audio };
             trackClipData.StartTime = 0;
             trackClipData.EndTime = audio.length;
 
@@ -393,11 +362,10 @@ namespace EGamePlay
             var self = this;
             var startTime = trackClipData.StartTime;
 
-            var actionTrack = GameObject.Instantiate(self.TrackTrm);
-            actionTrack.SetParent(self.TrackListTrm);
+            var actionTrack = Instantiate(self.TrackTrm, self.TrackListTrm, true);
             if (trackClipData.ActionEventData != null)
             {
-                actionTrack.GetComponentInChildren<Text>().text = "";//$"{trackClipData.ActionEventData.NewExecution}";
+                actionTrack.GetComponentInChildren<Text>().text = "";
             }
 
             var trackClip = actionTrack.GetComponentInChildren<TrackClip>();
@@ -409,14 +377,9 @@ namespace EGamePlay
             trackClip.SetClipType(trackClipData);
         }
 
-        public void PlaySkillExecution()
+        private void PlaySkillExecution()
         {
-            if (CurrentExecutionObject == null)
-            {
-                return;
-            }
-
-            //#if !EGAMEPLAY_EXCEL
+            if (CurrentExecutionObject == null) return;
             SkillTimeImage.fillAmount = 0;
             CurrentTime = 0;
             IsPlaying = true;
@@ -425,14 +388,8 @@ namespace EGamePlay
                 skillAbility.LoadExecution();
                 if (CurrentExecutionObject.TargetInputType == ExecutionTargetInputType.Target)
                 {
-                    if (skillAbility.ConfigObject.AffectTargetType == SkillAffectTargetType.EnemyTeam)
-                    {
-                        HeroEntity.GetComponent<SpellComponent>().SpellWithTarget(skillAbility, BossEntity);
-                    }
-                    else
-                    {
-                        HeroEntity.GetComponent<SpellComponent>().SpellWithTarget(skillAbility, HeroEntity);
-                    }
+                    HeroEntity.GetComponent<SpellComponent>().SpellWithTarget(skillAbility,
+                        skillAbility.ConfigObject.AffectTargetType == SkillAffectTargetType.EnemyTeam ? BossEntity : HeroEntity);
                 }
                 if (CurrentExecutionObject.TargetInputType == ExecutionTargetInputType.Point)
                 {
@@ -442,7 +399,6 @@ namespace EGamePlay
             else
             {
                 HeroEntity.ModelTrans.localRotation = Quaternion.LookRotation(BossEntity.Position - HeroEntity.Position);
-                //var skillAbility = Hero.Instance.CombatEntity.AttachSkill(new SkillConfigObject() { Id = 9999 });
                 if (CurrentExecutionObject.TargetInputType == ExecutionTargetInputType.Target)
                 {
                     var execution = HeroEntity.AddChild<AbilityExecution>(null);
@@ -450,40 +406,32 @@ namespace EGamePlay
                     execution.InputTarget = BossEntity;
                     execution.LoadExecutionEffects();
                     execution.BeginExecute();
-                    //execution.AddComponent<UpdateComponent>();
                 }
-                if (CurrentExecutionObject.TargetInputType == ExecutionTargetInputType.Point)
+
+                if (CurrentExecutionObject.TargetInputType != ExecutionTargetInputType.Point) return;
                 {
                     var execution = HeroEntity.AddChild<AbilityExecution>(null);
                     execution.ExecutionObject = CurrentExecutionObject;
                     execution.InputPoint = BossEntity.Position;
                     execution.LoadExecutionEffects();
                     execution.BeginExecute();
-                    //execution.AddComponent<UpdateComponent>();
                 }
             }
-            //#endif
         }
     }
 
     public static class ExecutionLinkPanelEx
     {
-        public static RectTransform rectTransform(this Transform transform)
+        public static RectTransform RectTransform(this Transform transform)
         {
             return transform.GetComponent<RectTransform>();
         }
-
-        public static RectTransform rectTransform(this GameObject transform)
-        {
-            return transform.GetComponent<RectTransform>();
-        }
-
         public static void DestroyChildren(this Transform transform)
         {
-            for (int i = transform.childCount - 1; i >= 0; i--)
+            for (var i = transform.childCount - 1; i >= 0; i--)
             {
                 var child = transform.GetChild(i);
-                GameObject.DestroyImmediate(child.gameObject);
+                Object.DestroyImmediate(child.gameObject);
             }
         }
     }

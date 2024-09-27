@@ -13,7 +13,6 @@ public class CombatRunFlow : WorkFlow
     {
         base.Startup();
         Log.Debug("CombatRunFlow Startup");
-
         await ET.TimeHelper.WaitAsync(1000);
         CombatContext.Instance.StartCombat();
     }

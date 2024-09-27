@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using EGamePlay;
 using EGamePlay.Combat;
@@ -10,11 +8,9 @@ using ET;
 public class TurnCombatObject : MonoBehaviour
 {
     public CombatEntity CombatEntity { get; set; }
-    public Vector3 SeatPoint { get; set; }
-    public CombatObjectData CombatObjectData { get; set; }
-    public AnimationComponent AnimationComponent => CombatObjectData.AnimationComponent;
-
-
+    private Vector3 SeatPoint { get; set; }
+    private CombatObjectData CombatObjectData { get; set; }
+    private AnimationComponent AnimationComponent => CombatObjectData.AnimationComponent;
     public void Setup(int seat)
     {
         if (transform.parent.name.Contains("Hero")) CombatEntity = CombatContext.Instance.AddHeroEntity(seat);
@@ -33,19 +29,12 @@ public class TurnCombatObject : MonoBehaviour
         CombatEntity.ListenActionPoint(ActionPointType.PostReceiveStatus, OnReceiveStatus);
         CombatEntity.Subscribe<RemoveStatusEvent>(OnRemoveStatus);
         CombatEntity.Subscribe<EntityDeadEvent>(OnDead);
-
-        //var config = Resources.Load<StatusConfigObject>("StatusConfigs/Status_Tenacity");
-        //var Status = CombatEntity.AttachStatus<StatusTenacity>(config);
-        //Status.Caster = CombatEntity;
-        //Status.TryActivateAbility();
     }
-
     private void Update()
     {
         CombatEntity.Position = transform.position;
     }
-
-    public void OnPreJumpTo(Entity action)
+    private void OnPreJumpTo(Entity action)
     {
         var jumpToAction = action as JumpToAction;
         var target = jumpToAction.Target as CombatEntity;
@@ -55,14 +44,12 @@ public class TurnCombatObject : MonoBehaviour
         AnimationComponent.Speed = 2f;
         AnimationComponent.PlayFade(AnimationComponent.RunAnimation);
     }
-
-    public void OnPreAttack(Entity action)
+    private void OnPreAttack(Entity action)
     {
         AnimationComponent.Speed = 1f;
         AnimationComponent.PlayFade(AnimationComponent.AttackAnimation);
     }
-
-    public async void OnPostAttack(Entity action)
+    private async void OnPostAttack(Entity action)
     {
         transform.DOMove(SeatPoint, CombatEntity.JumpToTime / 1000f).SetEase(Ease.Linear);
         var modelTrm = transform.GetChild(0);
@@ -85,36 +72,33 @@ public class TurnCombatObject : MonoBehaviour
 
         var damageAction = combatAction as DamageAction;
         CombatObjectData.HealthBarImage.fillAmount = CombatEntity.CurrentHealth.ToPercent();
-        var damageText = GameObject.Instantiate(CombatObjectData.DamageText);
-        damageText.transform.SetParent(CombatObjectData.CanvasTrm);
+        var damageText = Instantiate(CombatObjectData.DamageText, CombatObjectData.CanvasTrm, true);
         damageText.transform.localPosition = Vector3.up * 120;
         damageText.transform.localScale = Vector3.one;
         damageText.transform.localEulerAngles = Vector3.zero;
         damageText.text = $"-{damageAction.DamageValue.ToString()}";
         damageText.GetComponent<DOTweenAnimation>().DORestart();
-        GameObject.Destroy(damageText.gameObject, 0.5f);
+        Destroy(damageText.gameObject, 0.5f);
     }
 
     private async void OnDead(EntityDeadEvent deadEvent)
     {
         AnimationComponent.PlayFade(AnimationComponent.DeadAnimation);
         await TimeHelper.WaitAsync(2000);
-        GameObject.Destroy(gameObject);
+        Destroy(gameObject);
     }
 
     private void OnReceiveCure(Entity combatAction)
     {
         var action = combatAction as CureAction;
         CombatObjectData.HealthBarImage.fillAmount = CombatEntity.CurrentHealth.ToPercent();
-
-        var cureText = GameObject.Instantiate(CombatObjectData.CureText);
-        cureText.transform.SetParent(CombatObjectData.CanvasTrm);
+        var cureText = Instantiate(CombatObjectData.CureText, CombatObjectData.CanvasTrm, true);
         cureText.transform.localPosition = Vector3.up * 120;
         cureText.transform.localScale = Vector3.one;
         cureText.transform.localEulerAngles = Vector3.zero;
         cureText.text = $"+{action.CureValue.ToString()}";
         cureText.GetComponent<DOTweenAnimation>().DORestart();
-        GameObject.Destroy(cureText.gameObject, 0.5f);
+        Destroy(cureText.gameObject, 0.5f);
     }
 
     private void OnReceiveStatus(Entity combatAction)
@@ -161,45 +145,28 @@ public class TurnCombatObject : MonoBehaviour
         if (name == "Monster")
         {
             var trm = CombatObjectData.StatusSlotsTrm.Find(eventData.StatusId.ToString());
-            if (trm != null)
-            {
-                GameObject.Destroy(trm.gameObject);
-            }
+            if (trm != null) Destroy(trm.gameObject);
         }
-
         var statusConfig = eventData.Status.Config;
         if (statusConfig.KeyName == "Vertigo")
         {
             CombatEntity.GetComponent<MotionComponent>().Enable = true;
             CombatObjectData.AnimationComponent.Play(CombatObjectData.AnimationComponent.IdleAnimation);
-            if (CombatObjectData.vertigoParticle != null)
-            {
-                GameObject.Destroy(CombatObjectData.vertigoParticle);
-            }
+            if (CombatObjectData.vertigoParticle != null) Destroy(CombatObjectData.vertigoParticle);
         }
-        if (statusConfig.KeyName == "Weak")
-        {
-            if (CombatObjectData.weakParticle != null)
-            {
-                GameObject.Destroy(CombatObjectData.weakParticle);
-            }
-        }
+        if (statusConfig.KeyName != "Weak") return;
+        if (CombatObjectData.weakParticle != null) Destroy(CombatObjectData.weakParticle);
     }
 
     private ETCancellationToken token;
-    public async ETTask PlayThenIdleAsync(AnimationClip animation)
+
+    private async ETTask PlayThenIdleAsync(AnimationClip animation)
     {
         AnimationComponent.Play(AnimationComponent.IdleAnimation);
         AnimationComponent.PlayFade(animation);
-        if (token != null)
-        {
-            token.Cancel();
-        }
+        token?.Cancel();
         token = new ETCancellationToken();
         var isTimeout = await TimerManager.Instance.WaitAsync((int)(animation.length * 1000), token);
-        if (isTimeout)
-        {
-            AnimationComponent.PlayFade(AnimationComponent.IdleAnimation);
-        }
+        if (isTimeout) AnimationComponent.PlayFade(AnimationComponent.IdleAnimation);
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 using System;
 using Sirenix.OdinInspector;
 
@@ -11,47 +9,37 @@ namespace EGamePlay.Combat
     /// </summary>
     public sealed class ActionPoint
     {
-        public List<Action<Entity>> Listeners { get; set; } = new List<Action<Entity>>();
-        public List<ActionPointObserveComponent> Observers { get; set; } = new List<ActionPointObserveComponent>();
-
-
+        private List<Action<Entity>> Listeners { get; set; } = new ();
+        private List<ActionPointObserveComponent> Observers { get; set; } = new ();
         public void AddListener(Action<Entity> action)
         {
             Listeners.Add(action);
         }
-
         public void RemoveListener(Action<Entity> action)
         {
             Listeners.Remove(action);
         }
-
         public void AddObserver(ActionPointObserveComponent action)
         {
             Observers.Add(action);
         }
-
         public void RemoveObserver(ActionPointObserveComponent action)
         {
             Observers.Remove(action);
         }
-
         public void TriggerAllObservers(Entity actionExecution)
         {
             if (Listeners.Count > 0)
             {
-                for (int i = Listeners.Count - 1; i >= 0; i--)
+                for (var i = Listeners.Count - 1; i >= 0; i--)
                 {
-                    var item = Listeners[i];
-                    item.Invoke(actionExecution);
+                    Listeners[i].Invoke(actionExecution);
                 }
             }
-            if (Observers.Count > 0)
+            if (Observers.Count <= 0) return;
+            for (var i = Observers.Count - 1; i >= 0; i--)
             {
-                for (int i = Observers.Count - 1; i >= 0; i--)
-                {
-                    var item = Observers[i];
-                    item.OnTrigger(actionExecution);
-                }
+                Observers[i].OnTrigger(actionExecution);
             }
         }
     }
@@ -62,7 +50,7 @@ namespace EGamePlay.Combat
     {
         [LabelText("（空）")]
         None = 0,
-
+        
         [LabelText("造成伤害前")]
         PreCauseDamage = 1 << 1,
         [LabelText("承受伤害前")]
@@ -125,9 +113,7 @@ namespace EGamePlay.Combat
     /// </summary>
     public sealed class ActionPointComponent : Component
     {
-        private Dictionary<ActionPointType, ActionPoint> ActionPoints { get; set; } = new Dictionary<ActionPointType, ActionPoint>();
-
-
+        private Dictionary<ActionPointType, ActionPoint> ActionPoints { get; set; } = new ();
         public void AddListener(ActionPointType actionPointType, Action<Entity> action)
         {
             if (!ActionPoints.ContainsKey(actionPointType))
@@ -136,7 +122,6 @@ namespace EGamePlay.Combat
             }
             ActionPoints[actionPointType].AddListener(action);
         }
-
         public void RemoveListener(ActionPointType actionPointType, Action<Entity> action)
         {
             if (ActionPoints.ContainsKey(actionPointType))
@@ -144,7 +129,6 @@ namespace EGamePlay.Combat
                 ActionPoints[actionPointType].RemoveListener(action);
             }
         }
-
         public void AddObserver(ActionPointType actionPointType, ActionPointObserveComponent action)
         {
             if (!ActionPoints.ContainsKey(actionPointType))
@@ -152,9 +136,7 @@ namespace EGamePlay.Combat
                 ActionPoints.Add(actionPointType, new ActionPoint());
             }
             ActionPoints[actionPointType].AddObserver(action);
-            //Log.Debug($"AddObserver {actionPointType} {ActionPoints[actionPointType].Observers.Count}");
         }
-
         public void RemoveObserver(ActionPointType actionPointType, ActionPointObserveComponent action)
         {
             if (ActionPoints.ContainsKey(actionPointType))
@@ -162,23 +144,16 @@ namespace EGamePlay.Combat
                 ActionPoints[actionPointType].RemoveObserver(action);
             }
         }
-
         public ActionPoint GetActionPoint(ActionPointType actionPointType)
         {
             if (ActionPoints.TryGetValue(actionPointType, out var actionPoint)) ;
             return actionPoint;
         }
-
         public void TriggerActionPoint(ActionPointType actionPointType, Entity actionExecution)
         {
-            //Log.Debug($"TriggerActionPoint {actionPointType}");
             foreach (var item in ActionPoints)
             {
-                if (item.Key.HasFlag(actionPointType))
-                {
-                    //Log.Debug($"TriggerActionPoint {actionPointType} {item.Value.Observers.Count}");
-                    item.Value.TriggerAllObservers(actionExecution);
-                }
+                if (item.Key.HasFlag(actionPointType)) item.Value.TriggerAllObservers(actionExecution);
             }
         }
     }

@@ -38,7 +38,7 @@ namespace EGamePlay.Combat
             }
         }
 
-        public override void OnEnable()
+        protected override void OnEnable()
         {
             foreach (var item in AbilityEffects)
             {
@@ -46,7 +46,7 @@ namespace EGamePlay.Combat
             }
         }
 
-        public override void OnDisable()
+        protected override void OnDisable()
         {
             foreach (var item in AbilityEffects)
             {

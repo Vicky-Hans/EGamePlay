@@ -1,9 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using EGamePlay;
-using EGamePlay.Combat;
 using GameUtils;
 using System;
 
@@ -19,11 +15,11 @@ namespace EGamePlay.Combat
     /// <summary>
     /// 技能施法组件
     /// </summary>
-    public class SpellComponent : EGamePlay.Component
+    public class SpellComponent : Component
     {
         private CombatEntity CombatEntity => GetEntity<CombatEntity>();
         public override bool DefaultEnable { get; set; } = true;
-        public Dictionary<int, ExecutionObject> ExecutionObjects = new Dictionary<int, ExecutionObject>();
+        public Dictionary<int, ExecutionObject> ExecutionObjects = new ();
 
 
         public override void Awake()
@@ -103,23 +99,18 @@ namespace EGamePlay.Combat
         public SpellAction SpellWithPoint(Ability spellSkill, Vector3 point)
         {
             Log.Console($"SpellComponent SpellWithPoint {spellSkill.Config.Id}");
-            if (CombatEntity.SpellingExecution != null)
-                return null;
-
-            if (CombatEntity.SpellAbility.TryMakeAction(out var spellAction))
-            {
-                spellAction.SkillAbility = spellSkill;
-                var forward = Vector3.Normalize(point - spellSkill.OwnerEntity.Position);
-                var rotation = Quaternion.LookRotation(forward);
-                spellSkill.OwnerEntity.Rotation = rotation;
-                var angle = rotation.eulerAngles.y;
-                var radian = angle * MathF.PI / 180f;
-                spellAction.InputDirection = forward;
-                spellAction.InputRadian = radian;
-                spellAction.InputPoint = point;
-                spellAction.SpellSkill();
-            }
-
+            if (CombatEntity.SpellingExecution != null) return null;
+            if (!CombatEntity.SpellAbility.TryMakeAction(out var spellAction)) return spellAction;
+            spellAction.SkillAbility = spellSkill;
+            var forward = Vector3.Normalize(point - spellSkill.OwnerEntity.Position);
+            var rotation = Quaternion.LookRotation(forward);
+            spellSkill.OwnerEntity.Rotation = rotation;
+            var angle = rotation.eulerAngles.y;
+            var radian = angle * MathF.PI / 180f;
+            spellAction.InputDirection = forward;
+            spellAction.InputRadian = radian;
+            spellAction.InputPoint = point;
+            spellAction.SpellSkill();
             return spellAction;
         }
 #endif

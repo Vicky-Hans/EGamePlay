@@ -1,9 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using EGamePlay;
 using System;
 using GameUtils;
 
@@ -18,16 +14,12 @@ public class TargetSelectManager : MonoBehaviour
     public GameObject HeroObj;
     public GameObject RangeCircleObj;
     public Image CursorImage;
-
-
     private void Awake()
     {
         Instance = this;
-        //CursorImage = GetComponent<Image>();
         CursorColor = CursorImage.color;
         Hide();
     }
-
     private void Update()
     {
         RangeCircleObj.transform.position = new Vector3(HeroObj.transform.position.x, 0.1f, HeroObj.transform.position.z);
@@ -48,7 +40,7 @@ public class TargetSelectManager : MonoBehaviour
                 CursorImage.color = CursorColor;
             }
         }
-        if (TargetLimitType == TargetLimitType.SelfTeam)
+        if (TargetLimitType != TargetLimitType.SelfTeam) return;
         {
             if (RaycastHelper.CastHeroObj(out var enemyObj))
             {
@@ -65,7 +57,6 @@ public class TargetSelectManager : MonoBehaviour
             }
         }
     }
-
     public void Show(Action<GameObject> onSelectTargetCallback)
     {
         gameObject.SetActive(true);
@@ -74,7 +65,6 @@ public class TargetSelectManager : MonoBehaviour
         RangeCircleObj.SetActive(true);
         OnSelectTargetCallback = onSelectTargetCallback;
     }
-
     public void Hide()
     {
         Cursor.visible = true;

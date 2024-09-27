@@ -1,11 +1,5 @@
 #if UNITY_EDITOR
-using System;
-using System.Collections.Generic;
 using UnityEditor;
-using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
-
 namespace EGamePlay
 {
     [CustomEditor(typeof(TrackClip))]
@@ -20,12 +14,6 @@ namespace EGamePlay
         {
             SceneView.duringSceneGui -= OnSceneViewGUI;
         }
-
-        //private void OnSceneGUI()
-        //{
-        //    OnSceneViewGUI(null);
-        //}
-
         void OnSceneViewGUI(SceneView sceneView)
         {
             //var TrackClipData = (target as TrackClip).TrackClipData;

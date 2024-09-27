@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using DG.Tweening;
-
+﻿using UnityEngine;
 public class AnimationComponent : MonoBehaviour
 {
     public Animancer.AnimancerComponent AnimancerComponent;
@@ -17,8 +12,6 @@ public class AnimationComponent : MonoBehaviour
     public AnimationClip DeadAnimation;
     public AnimationClip[] AnimationClips;
     public float Speed { get; set; } = 1f;
-    
-    
     private void Start()
     {
         AnimancerComponent.Animator.fireEvents = false;
@@ -33,29 +26,23 @@ public class AnimationComponent : MonoBehaviour
             AnimancerComponent.States.CreateIfNew(item);
         }
     }
-
     public void Play(AnimationClip clip)
     {
         var state = AnimancerComponent.States.GetOrCreate(clip);
         state.Speed = Speed;
         AnimancerComponent.Play(state);
     }
-    
     public void PlayFade(AnimationClip clip)
     {
         var state = AnimancerComponent.States.GetOrCreate(clip);
         state.Speed = Speed;
         AnimancerComponent.Play(state, 0.25f);
     }
-
     public void TryPlayFade(AnimationClip clip)
     {
         var state = AnimancerComponent.States.GetOrCreate(clip);
         state.Speed = Speed;
-        if (AnimancerComponent.IsPlaying(clip))
-        {
-            return;
-        }
+        if (AnimancerComponent.IsPlaying(clip)) return;
         AnimancerComponent.Play(state, 0.25f);
     }
 }

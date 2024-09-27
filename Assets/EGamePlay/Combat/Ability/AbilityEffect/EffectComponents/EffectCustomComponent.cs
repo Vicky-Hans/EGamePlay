@@ -18,7 +18,7 @@ namespace EGamePlay.Combat
             //Entity.OnEvent(nameof(AbilityEffect.StartAssignEffect), OnAssignEffect);
         }
 
-        public override void OnEnable()
+        protected override void OnEnable()
         {
             if (GetEntity<AbilityEffect>().EffectConfig is CustomEffect customEffect)
             {

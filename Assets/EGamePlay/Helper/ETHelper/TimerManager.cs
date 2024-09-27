@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using EGamePlay;
 
 namespace ET
@@ -9,38 +8,33 @@ namespace ET
 	{
 		void Run(bool isTimeout);
 	}
-
 	public class OnceWaitTimer: Entity, ITimer
 	{
-		public ETTaskCompletionSource<bool> Callback { get; set; }
-
+		private ETTaskCompletionSource<bool> Callback { get; set; }
         public override void Awake(object initData)
         {
 			Callback = initData as ETTaskCompletionSource<bool>;
 		}
-
         public void Run(bool isTimeout)
 		{
-			ETTaskCompletionSource<bool> tcs = this.Callback;
-			this.GetParent<TimerManager>().Remove(this.Id);
+			var tcs = Callback;
+			GetParent<TimerManager>().Remove(Id);
 			tcs.SetResult(isTimeout);
 		}
 	}
 
 	public class OnceTimer: Entity, ITimer
 	{
-		public Action<bool> Callback { get; set; }
-
+		private Action<bool> Callback { get; set; }
 		public override void Awake(object initData)
 		{
 			Callback = initData as Action<bool>;
 		}
-
 		public void Run(bool isTimeout)
 		{
 			try
 			{
-				this.Callback.Invoke(isTimeout);
+				Callback.Invoke(isTimeout);
 			}
 			catch (Exception e)
 			{
@@ -60,130 +54,94 @@ namespace ET
 		public override void Awake(object initData)
 		{
 			var awakeData = initData as RepeatedTimerAwakeData;
-			this.StartTime = TimeHelper.ClientNow();
-			this.RepeatedTime = awakeData.RepeatedTime;
-			this.Callback = awakeData.Callback;
-			this.Count = 1;
+			StartTime = TimeHelper.ClientNow();
+			if (awakeData != null)
+			{
+				RepeatedTime = awakeData.RepeatedTime;
+				Callback = awakeData.Callback;
+			}
+			Count = 1;
 		}
-
 		private long StartTime { get; set; }
-		
 		private long RepeatedTime { get; set; }
-
 		// 下次一是第几次触发
 		private int Count { get; set; }
-		
-		public Action<bool> Callback { private get; set; }
-		
+		private Action<bool> Callback { get; set; }
 		public void Run(bool isTimeout)
 		{
-			++this.Count;
-			TimerManager timerComponent = this.GetParent<TimerManager>();
-			long tillTime = this.StartTime + this.RepeatedTime * this.Count;
-			timerComponent.AddToTimeId(tillTime, this.Id);
-
+			++Count;
+			var timerComponent = GetParent<TimerManager>();
+			var tillTime = StartTime + RepeatedTime * Count;
+			timerComponent.AddToTimeId(tillTime, Id);
 			try
 			{
-				this.Callback?.Invoke(isTimeout);
+				Callback?.Invoke(isTimeout);
 			}
 			catch (Exception e)
 			{
 				Log.Error(e);
 			}
 		}
-
 		public override void OnDestroy()
 		{
-			if (this.IsDisposed)
-			{
-				return;
-			}
-			
-			long id = this.Id;
-
+			if (IsDisposed) return;
+			var id = Id;
 			if (id == 0)
 			{
 				Log.Error($"RepeatedTimer可能多次释放了");
 				return;
 			}
-			
-			//base.Dispose();
-
-			this.StartTime = 0;
-			this.RepeatedTime = 0;
-			this.Callback = null;
-			this.Count = 0;
+			StartTime = 0;
+			RepeatedTime = 0;
+			Callback = null;
+			Count = 0;
 		}
 	}
-
 	public class TimerManager : Entity
 	{
 		public static TimerManager Instance { get; set; }
-		
-		private readonly Dictionary<long, ITimer> timers = new Dictionary<long, ITimer>();
-
+		private readonly Dictionary<long, ITimer> timers = new ();
 		/// <summary>
 		/// key: time, value: timer id
 		/// </summary>
-		public readonly MultiMap<long, long> TimeId = new MultiMap<long, long>();
-
-		private readonly Queue<long> timeOutTime = new Queue<long>();
-		
-		private readonly Queue<long> timeOutTimerIds = new Queue<long>();
-
+		private readonly MultiMap<long, long> timeId = new ();
+		private readonly Queue<long> timeOutTime = new ();
+		private readonly Queue<long> timeOutTimerIds = new ();
 		// 记录最小时间，不用每次都去MultiMap取第一个值
 		private long minTime;
-
-
         public override void Awake()
         {
 			Instance = this;
         }
-
         public new void Update()
 		{
-			if (this.TimeId.Count == 0)
+			if (timeId.Count == 0) return;
+			var timeNow = TimeHelper.ClientNow();
+			if (timeNow < minTime) return;
+			foreach (var kv in timeId.GetDictionary())
 			{
-				return;
-			}
-
-			long timeNow = TimeHelper.ClientNow();
-
-			if (timeNow < this.minTime)
-			{
-				return;
-			}
-			
-			foreach (KeyValuePair<long, List<long>> kv in this.TimeId.GetDictionary())
-			{
-				long k = kv.Key;
+				var k = kv.Key;
 				if (k > timeNow)
 				{
 					minTime = k;
 					break;
 				}
-				this.timeOutTime.Enqueue(k);
+				timeOutTime.Enqueue(k);
 			}
 
-			while(this.timeOutTime.Count > 0)
+			while(timeOutTime.Count > 0)
 			{
-				long time = this.timeOutTime.Dequeue();
-				foreach(long timerId in this.TimeId[time])
+				var time = timeOutTime.Dequeue();
+				foreach(var timerId in timeId[time])
 				{
-					this.timeOutTimerIds.Enqueue(timerId);	
+					timeOutTimerIds.Enqueue(timerId);	
 				}
-				this.TimeId.Remove(time);
+				timeId.Remove(time);
 			}
-
-			while(this.timeOutTimerIds.Count > 0)
+			while(timeOutTimerIds.Count > 0)
 			{
-				long timerId = this.timeOutTimerIds.Dequeue();
-				ITimer timer;
-				if (!this.timers.TryGetValue(timerId, out timer))
-				{
-					continue;
-				}
-				
+				var timerId = timeOutTimerIds.Dequeue();
+				if (!timers.TryGetValue(timerId, out var timer)) continue;
 				timer.Run(true);
 			}
 		}
@@ -328,7 +286,7 @@ namespace ET
 
 		public void AddToTimeId(long tillTime, long id)
 		{
-			this.TimeId.Add(tillTime, id);
+			this.timeId.Add(tillTime, id);
 			if (tillTime < this.minTime)
 			{
 				this.minTime = tillTime;

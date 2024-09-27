@@ -1,11 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Sirenix.OdinInspector;
+﻿using UnityEngine;
 using EGamePlay.Combat;
 using EGamePlay;
 using GameUtils;
-using ET;
 
 /// <summary>
 /// 状态的坚韧效果组件

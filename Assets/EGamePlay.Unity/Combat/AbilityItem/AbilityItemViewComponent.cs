@@ -24,7 +24,7 @@ namespace EGamePlay.Combat
             }
         }
 
-        public override void OnDestroy()
+        protected override void OnDestroy()
         {
             base.OnDestroy();
             if (AbilityItemTrans != null)

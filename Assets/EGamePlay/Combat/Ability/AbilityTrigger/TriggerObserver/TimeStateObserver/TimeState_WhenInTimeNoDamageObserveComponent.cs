@@ -19,7 +19,7 @@ namespace EGamePlay.Combat
             combatEntity.GetComponent<ActionPointComponent>().AddListener(ActionPointType.PostReceiveDamage, WhenReceiveDamage);
         }
 
-        public override void OnDestroy()
+        protected override void OnDestroy()
         {
             var combatEntity = GetEntity<AbilityTrigger>().ParentEntity;
             combatEntity.GetComponent<ActionPointComponent>().RemoveListener(ActionPointType.PostReceiveDamage, WhenReceiveDamage);

@@ -15,8 +15,8 @@ namespace EGamePlay.Combat
     /// </summary>
     public class FloatModifierCollection
     {
-        public float TotalValue { get; private set; }
-        private List<FloatModifier> Modifiers { get; } = new List<FloatModifier>();
+        private float TotalValue { get; set; }
+        private List<FloatModifier> Modifiers { get; } = new ();
 
         public float AddModifier(FloatModifier modifier)
         {
@@ -32,16 +32,13 @@ namespace EGamePlay.Combat
             return TotalValue;
         }
 
-        public void Update()
+        private void Update()
         {
             TotalValue = 0;
             foreach (var item in Modifiers)
-            {
                 TotalValue += item.Value;
-            }
         }
     }
-
     public enum ModifierType : int
     {
         Add,
@@ -49,7 +46,6 @@ namespace EGamePlay.Combat
         FinalAdd,
         FinalPctAdd,
     }
-
     /// <summary>
     /// 浮点型数值
     /// </summary>
@@ -61,10 +57,8 @@ namespace EGamePlay.Combat
         public float pctAdd { get; private set; }
         public float finalAdd { get; private set; }
         public float finalPctAdd { get; private set; }
-        private Dictionary<int, FloatModifierCollection> TypeModifierCollections { get; } = new Dictionary<int, FloatModifierCollection>();
+        private Dictionary<int, FloatModifierCollection> TypeModifierCollections { get; } = new ();
         public AttributeType AttributeType { get; set; }
-
-
         public override void Awake()
         {
             baseValue = add = pctAdd = finalAdd = finalPctAdd = 0f;
@@ -116,7 +110,7 @@ namespace EGamePlay.Combat
             Update();
         }
 
-        public new void Update()
+        private new void Update()
         {
             var value1 = baseValue;
             var value2 = (value1 + add) * (100 + pctAdd) / 100f;

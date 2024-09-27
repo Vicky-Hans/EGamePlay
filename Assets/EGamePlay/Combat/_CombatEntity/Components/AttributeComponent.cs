@@ -1,21 +1,16 @@
 ﻿using System.Collections.Generic;
 #if EGAMEPLAY_ET
-using AO;
-using AO.EventType;
-using ET.EventType;
 #endif
 
 namespace EGamePlay.Combat
 {
     public class AttributeUpdateEvent { public FloatNumeric Numeric; }
-
     /// <summary>
     /// 战斗属性数值组件，在这里管理角色所有战斗属性数值的存储、变更、刷新等
     /// </summary>
     public class AttributeComponent : Component
     {
         private readonly Dictionary<string, FloatNumeric> attributeNameNumerics = new Dictionary<string, FloatNumeric>();
-        //private readonly Dictionary<AttributeType, FloatNumeric> attributeTypeNumerics = new Dictionary<AttributeType, FloatNumeric>();
         private readonly AttributeUpdateEvent attributeUpdateEvent = new AttributeUpdateEvent();
         public FloatNumeric MoveSpeed { get { return attributeNameNumerics[nameof(AttributeType.MoveSpeed)]; } }//移动速度
         public FloatNumeric HealthPoint { get { return attributeNameNumerics[nameof(AttributeType.HealthPoint)]; } }//当前生命值
@@ -26,12 +21,8 @@ namespace EGamePlay.Combat
         public FloatNumeric SpellResistance { get { return attributeNameNumerics[nameof(AttributeType.SpellResistance)]; } }//魔法抗性
         public FloatNumeric CriticalProbability { get { return attributeNameNumerics[nameof(AttributeType.CriticalProbability)]; } }//暴击概率
         public FloatNumeric CauseDamage { get { return attributeNameNumerics[nameof(AttributeType.CauseDamage)]; } }//暴击概率
-
-
-        public override void Awake()
-        {
-
-        }
+        
+        public override void Awake() { }
 
         public void InitializeCharacter()
         {
@@ -60,17 +51,14 @@ namespace EGamePlay.Combat
             attributeNameNumerics.Add(attributeType.ToString(), numeric);
             return numeric;
         }
-
         public FloatNumeric GetNumeric(AttributeType attributeType)
         {
             return attributeNameNumerics[attributeType.ToString()];
         }
-
         public FloatNumeric GetNumeric(string attributeName)
         {
             return attributeNameNumerics[attributeName];
         }
-
         public void OnNumericUpdate(FloatNumeric numeric)
         {
             attributeUpdateEvent.Numeric = numeric;

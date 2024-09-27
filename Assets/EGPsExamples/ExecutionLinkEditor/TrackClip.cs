@@ -216,7 +216,7 @@ namespace EGamePlay
             if (pEventData.button == PointerEventData.InputButton.Right)
             {
                 ExecutionLinkPanel.Instance.RightContextTrm.gameObject.SetActive(true);
-                ExecutionLinkPanel.Instance.RightContextTrm.rectTransform().anchoredPosition = new Vector2(pEventData.position.x, pEventData.position.y - Screen.height);
+                ExecutionLinkPanel.Instance.RightContextTrm.RectTransform().anchoredPosition = new Vector2(pEventData.position.x, pEventData.position.y - Screen.height);
             }
 #endif
         }

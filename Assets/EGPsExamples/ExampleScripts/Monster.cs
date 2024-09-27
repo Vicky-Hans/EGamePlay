@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using EGamePlay;
 using EGamePlay.Combat;
 using UnityEngine.UI;
@@ -20,15 +18,9 @@ public sealed class Monster : MonoBehaviour
     public Transform CanvasTrm;
     public Transform StatusSlotsTrm;
     public GameObject StatusIconPrefab;
-    //public GameObject VertigoParticlePrefab;
-    //public GameObject WeakParticlePrefab;
-
     private GameObject vertigoParticle;
     private GameObject weakParticle;
     public MotionComponent MotionComponent { get; set; }
-
-
-    // Start is called before the first frame update
     void Start()
     {
         CombatEntity = CombatContext.Instance.AddChild<CombatEntity>();
@@ -40,17 +32,7 @@ public sealed class Monster : MonoBehaviour
         CombatEntity.ListenActionPoint(ActionPointType.PostReceiveCure, OnReceiveCure);
         CombatEntity.ListenActionPoint(ActionPointType.PostReceiveStatus, OnReceiveStatus);
         CombatEntity.Subscribe<RemoveStatusEvent>(OnRemoveStatus);
-
-//#if EGAMEPLAY_EXCEL
-//        var config = ET.StatusConfigCategory.Instance.GetByName("Tenacity");
-//#else
-//        var config = Resources.Load<StatusConfigObject>("StatusConfigs/Status_Tenacity");
-//#endif
-//        var Status = CombatEntity.GetComponent<StatusComponent>().AttachStatus(config);
-//        Status.AddComponent<StatusTenacityComponent>();
-//        Status.OwnerEntity = CombatEntity;
-//        Status.TryActivateAbility();
-
+        
         var allConfigs = ConfigHelper.GetAll<AbilityConfig>().Values.ToArray();
         for (int i = 0; i < allConfigs.Length; i++)
         {
@@ -63,25 +45,11 @@ public sealed class Monster : MonoBehaviour
                 CombatEntity.BindSkillInput(ability, KeyCode.Q);
             }
         }
-
-        if (name == "Monster")// Boss
-        {
-            Boss = this;
-            var ExecutionLinkPanelObj = GameObject.Find("ExecutionLinkPanel");
-            if (ExecutionLinkPanelObj != null)
-            {
-                ExecutionLinkPanelObj.GetComponent<ExecutionLinkPanel>().BossEntity = Boss.CombatEntity;
-            }
-//#if !EGAMEPLAY_EXCEL
-//            config = Resources.Load<StatusConfigObject>("StatusConfigs/Status_QiangTi");
-//            Status = CombatEntity.AttachStatus(config);
-//            Status.OwnerEntity = CombatEntity;
-//            Status.TryActivateAbility();
-//#endif
-        }
+        if (name != "Monster") return; // Boss
+        Boss = this;
+        var executionLinkPanelObj = GameObject.Find("ExecutionLinkPanel");
+        if (executionLinkPanelObj != null) executionLinkPanelObj.GetComponent<ExecutionLinkPanel>().BossEntity = Boss.CombatEntity;
     }
-
-    // Update is called once per frame
     void Update()
     {
         if (MotionComponent.Enable)

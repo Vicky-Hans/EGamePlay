@@ -1,13 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System;
+﻿using UnityEngine;
 using GameUtils;
-using Sirenix.OdinInspector;
 #if EGAMEPLAY_ET
-using Unity.Mathematics;
-using Vector3 = Unity.Mathematics.float3;
-using Quaternion = Unity.Mathematics.quaternion;
 #endif
 
 namespace EGamePlay.Combat
@@ -18,20 +11,14 @@ namespace EGamePlay.Combat
     public sealed class MotionComponent : Component
     {
         public override bool DefaultEnable { get; set; } = true;
-        public Vector3 Position { get => GetEntity<CombatEntity>().Position; set => GetEntity<CombatEntity>().Position = value; }
+        private Vector3 Position { get => GetEntity<CombatEntity>().Position; set => GetEntity<CombatEntity>().Position = value; }
         public Quaternion Rotation { get => GetEntity<CombatEntity>().Rotation; set => GetEntity<CombatEntity>().Rotation = value; }
         public bool CanMove { get; set; }
-        public GameTimer IdleTimer { get; set; }
+        private GameTimer IdleTimer { get; set; }
         public GameTimer MoveTimer { get; set; }
-        public Vector3 MoveVector { get; set; }
+        private Vector3 MoveVector { get; set; }
         private Vector3 originPos;
-
-
-        public override void Awake()
-        {
-
-        }
-
+        public override void Awake() { }
         public void RunAI()
         {
             IdleTimer = new GameTimer(RandomHelper.RandomNumber(20, 30) / 10f);
@@ -39,13 +26,9 @@ namespace EGamePlay.Combat
             IdleTimer.Reset();
             originPos = Position;
         }
-
         public override void Update()
         {
-            if (IdleTimer == null)
-            {
-                return;
-            }
+            if (IdleTimer == null) return;
 #if !EGAMEPLAY_ET
             if (IdleTimer.IsRunning)
             {
@@ -53,12 +36,10 @@ namespace EGamePlay.Combat
             }
             else
             {
-                if (MoveTimer.IsRunning)
-                {
-                    MoveTimer.UpdateAsFinish(Time.deltaTime, MoveFinish);
-                    var speed = GetEntity<CombatEntity>().GetComponent<AttributeComponent>().MoveSpeed.Value;
-                    Position += MoveVector * speed;
-                }
+                if (!MoveTimer.IsRunning) return;
+                MoveTimer.UpdateAsFinish(Time.deltaTime, MoveFinish);
+                var speed = GetEntity<CombatEntity>().GetComponent<AttributeComponent>().MoveSpeed.Value;
+                Position += MoveVector * speed;
             }
 #endif
         }
@@ -69,10 +50,7 @@ namespace EGamePlay.Combat
             var x = RandomHelper.RandomNumber(-20, 20);
             var z = RandomHelper.RandomNumber(-20, 20);
             var vec2 = new Vector2(x, z);
-            if (Vector3.Distance(originPos, Position) > 0.1f)
-            {
-                vec2 = -(Position - originPos);
-            }
+            if (Vector3.Distance(originPos, Position) > 0.1f) vec2 = -(Position - originPos);
             vec2.Normalize();
             var right = new Vector2(1, 0);
             var y = VectorAngle(right, vec2);
@@ -81,19 +59,14 @@ namespace EGamePlay.Combat
             MoveVector = new Vector3(vec2.x, 0, vec2.y) / 100f;
             MoveTimer.Reset();
         }
-
         private void MoveFinish()
         {
             IdleTimer.Reset();
-
             var heroEntity = Hero.Instance.CombatEntity;
-            if (Vector3.Distance(heroEntity.Position, Position) < 5)
-            {
-                var combatEntity = GetEntity<CombatEntity>();
-                combatEntity.GetComponent<SpellComponent>().SpellWithTarget(combatEntity.GetComponent<SkillComponent>().IdSkills[1001], heroEntity);
-            }
+            if (!(Vector3.Distance(heroEntity.Position, Position) < 5)) return;
+            var combatEntity = GetEntity<CombatEntity>();
+            combatEntity.GetComponent<SpellComponent>().SpellWithTarget(combatEntity.GetComponent<SkillComponent>().IdSkills[1001], heroEntity);
         }
-
         private float VectorAngle(Vector2 from, Vector2 to)
         {
             var angle = 0f;

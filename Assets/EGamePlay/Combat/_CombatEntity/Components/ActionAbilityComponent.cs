@@ -1,12 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace EGamePlay.Combat
+﻿namespace EGamePlay.Combat
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public class ActionAbilityComponent : Component
-	{
-
-	}
+    public class ActionAbilityComponent : Component { }
 }

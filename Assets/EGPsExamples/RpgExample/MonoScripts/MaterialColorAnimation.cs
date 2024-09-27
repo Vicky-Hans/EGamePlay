@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using DG.Tweening;
 
 public class MaterialColorAnimation : MonoBehaviour
@@ -9,7 +7,6 @@ public class MaterialColorAnimation : MonoBehaviour
     public float Duration;
     public Ease Ease;
     public UnityEngine.Events.UnityEvent OnComplete;
-
     private void OnEnable()
     {
         var mat = GetComponent<Renderer>().material;

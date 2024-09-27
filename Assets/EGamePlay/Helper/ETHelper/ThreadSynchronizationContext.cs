@@ -6,29 +6,20 @@ namespace ET
 {
     public class ThreadSynchronizationContext : SynchronizationContext
     {
-        public static ThreadSynchronizationContext Instance { get; } = new ThreadSynchronizationContext(Thread.CurrentThread.ManagedThreadId);
-
+        public static ThreadSynchronizationContext Instance { get; } = new (Thread.CurrentThread.ManagedThreadId);
         private readonly int threadId;
-
         // 线程同步队列,发送接收socket回调都放到该队列,由poll线程统一执行
-        private readonly ConcurrentQueue<Action> queue = new ConcurrentQueue<Action>();
-
+        private readonly ConcurrentQueue<Action> queue = new ();
         private Action a;
-
-        public ThreadSynchronizationContext(int threadId)
+        private ThreadSynchronizationContext(int threadId)
         {
             this.threadId = threadId;
         }
-
         public void Update()
         {
             while (true)
             {
-                if (!this.queue.TryDequeue(out a))
-                {
-                    return;
-                }
-
+                if (!queue.TryDequeue(out a)) return;
                 try
                 {
                     a();
@@ -39,34 +30,25 @@ namespace ET
                 }
             }
         }
-
         public override void Post(SendOrPostCallback callback, object state)
         {
-            this.Post(() => callback(state));
-        }
-		
-        public void Post(Action action)
-        {
-            if (Thread.CurrentThread.ManagedThreadId == this.threadId)
+            if (Thread.CurrentThread.ManagedThreadId == threadId)
             {
                 try
                 {
-                    action();
+                    callback(state);
                 }
                 catch (Exception ex)
                 {
                     Log.Error(ex);
                 }
-
                 return;
             }
-
-            this.queue.Enqueue(action);
+            queue.Enqueue(() => callback(state));
         }
-		
         public void PostNext(Action action)
         {
-            this.queue.Enqueue(action);
+            queue.Enqueue(action);
         }
     }
 }

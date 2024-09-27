@@ -20,13 +20,13 @@ namespace EGamePlay.Combat
             ActionControlEffect = GetEntity<AbilityEffect>().EffectConfig as ActionControlEffect;
         }
 
-        public override void OnEnable()
+        protected override void OnEnable()
         {
             //Log.Debug($"EffectActionControlComponent OnEnable {Entity.GetParent<Ability>().Config.KeyName}");
             Entity.Parent.Parent.GetComponent<StatusComponent>().OnStatusesChanged(Entity.GetParent<Ability>());
         }
 
-        public override void OnDisable()
+        protected override void OnDisable()
         {
             Entity.Parent.Parent.GetComponent<StatusComponent>().OnStatusesChanged(Entity.GetParent<Ability>());
         }

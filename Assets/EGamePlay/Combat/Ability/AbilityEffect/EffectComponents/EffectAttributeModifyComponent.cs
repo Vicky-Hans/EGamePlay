@@ -22,7 +22,7 @@ namespace EGamePlay.Combat
             ModifyValueFormula = AttributeModifyEffect.NumericValue;
         }
 
-        public override void OnEnable()
+        protected override void OnEnable()
         {
             //Log.Debug($"EffectAttributeModifyComponent OnEnable {AttributeModifyEffect.AttributeType}");
             var parentEntity = GetEntity<AbilityEffect>().OwnerAbility.Parent;
@@ -50,7 +50,7 @@ namespace EGamePlay.Combat
             AttributeModifier = numericModifier;
         }
 
-        public override void OnDisable()
+        protected override void OnDisable()
         {
             //Log.Debug($"EffectAttributeModifyComponent OnDisable {AttributeModifyEffect.AttributeType}");
             var parentEntity = GetEntity<AbilityEffect>().OwnerAbility.Parent;

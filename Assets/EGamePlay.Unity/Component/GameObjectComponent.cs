@@ -17,7 +17,7 @@ namespace EGamePlay
             view.Component = this;
         }
 
-        public override void OnDestroy()
+        protected override void OnDestroy()
         {
             base.OnDestroy();
             UnityEngine.GameObject.Destroy(GameObject);

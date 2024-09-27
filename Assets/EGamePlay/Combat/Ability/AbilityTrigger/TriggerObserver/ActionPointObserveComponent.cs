@@ -14,7 +14,7 @@ namespace EGamePlay.Combat
             combatEntity.GetComponent<ActionPointComponent>().AddObserver(abilityEffect.TriggerConfig.ActionPointType, this);
         }
 
-        public override void OnDestroy()
+        protected override void OnDestroy()
         {
             var abilityEffect = GetEntity<AbilityTrigger>();
             var combatEntity = abilityEffect.OwnerAbility.ParentEntity;

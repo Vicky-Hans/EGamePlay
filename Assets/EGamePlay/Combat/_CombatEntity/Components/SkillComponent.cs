@@ -3,15 +3,11 @@ using UnityEngine;
 
 namespace EGamePlay.Combat
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public class SkillComponent : Component
 	{
-        public Dictionary<string, Ability> NameSkills { get; set; } = new Dictionary<string, Ability>();
-        public Dictionary<int, Ability> IdSkills { get; set; } = new Dictionary<int, Ability>();
-        public Dictionary<KeyCode, Ability> InputSkills { get; set; } = new Dictionary<KeyCode, Ability>();
-
+        private Dictionary<string, Ability> NameSkills { get; set; } = new ();
+        public Dictionary<int, Ability> IdSkills { get; set; } = new ();
+        public Dictionary<KeyCode, Ability> InputSkills { get; set; } = new ();
         public Ability AttachSkill(object configObject)
         {
             var abilityComp = Entity.GetComponent<AbilityComponent>();
@@ -20,7 +16,6 @@ namespace EGamePlay.Combat
             IdSkills.Add(skill.Config.Id, skill);
             return skill;
         }
-
         public void RemoveSkill(Ability skill)
         {
             var abilityComp = Entity.GetComponent<AbilityComponent>();

@@ -4,13 +4,11 @@ using UnityEngine;
 
 public class CombatCreateFlow : WorkFlow
 {
-    public GameObject CombatRootClone { get; private set; }
-
-
+    private GameObject CombatRootClone { get; set; }
     public override void Awake()
     {
         var combatRoot = GameObject.Find("CombatRoot");
-        CombatRootClone = GameObject.Instantiate(combatRoot);
+        CombatRootClone = Object.Instantiate(combatRoot);
         CombatRootClone.SetActive(false);
     }
 
@@ -22,13 +20,12 @@ public class CombatCreateFlow : WorkFlow
         var combatRoot = GameObject.Find("CombatRoot");
         if (combatRoot == null)
         {
-            combatRoot = GameObject.Instantiate(CombatRootClone);
+            combatRoot = Object.Instantiate(CombatRootClone);
             combatRoot.name = "CombatRoot";
             combatRoot.SetActive(true);
         }
-
         var heroRoot = GameObject.Find("CombatRoot/HeroRoot").transform;
-        for (int i = 0; i < heroRoot.childCount; i++)
+        for (var i = 0; i < heroRoot.childCount; i++)
         {
             var hero = heroRoot.GetChild(i);
             var turnHero = hero.gameObject.AddComponent<TurnCombatObject>();
@@ -36,14 +33,13 @@ public class CombatCreateFlow : WorkFlow
             turnHero.CombatEntity.JumpToTime = FlowSource.GetParent<CombatFlow>().JumpToTime;
         }
         var monsterRoot = GameObject.Find("CombatRoot/MonsterRoot").transform;
-        for (int i = 0; i < monsterRoot.childCount; i++)
+        for (var i = 0; i < monsterRoot.childCount; i++)
         {
             var hero = monsterRoot.GetChild(i);
             var turnMonster = hero.gameObject.AddComponent<TurnCombatObject>();
             turnMonster.Setup(i);
             turnMonster.CombatEntity.JumpToTime = FlowSource.GetParent<CombatFlow>().JumpToTime;
         }
-
         Finish();
     }
 }
