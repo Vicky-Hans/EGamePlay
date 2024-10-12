@@ -26,10 +26,7 @@ namespace EGamePlay
         {
             return Entity as T;
         }
-        public virtual void Awake()
-        {
-
-        }
+        public virtual void Awake() { }
         public virtual void Awake(object initData) { }
         public virtual void Setup() { }
         public virtual void Setup(object initData) { }
@@ -55,11 +52,10 @@ namespace EGamePlay
             }
             entity.Dispose();
         }
-
-        protected T Publish<T>(T TEvent) where T : class
+        protected T Publish<T>(T @event) where T : class
         {
-            Entity.Publish(TEvent);
-            return TEvent;
+            Entity.Publish(@event);
+            return @event;
         }
         public void Subscribe<T>(Action<T> action) where T : class
         {

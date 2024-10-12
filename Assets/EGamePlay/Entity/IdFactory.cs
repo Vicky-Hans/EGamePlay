@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Linq;
-using System.Collections.Generic;
 
 namespace EGamePlay
 {
     public static class IdFactory
     {
-        public static long BaseRevertTicks { get; set; }
-
-
+        private static long BaseRevertTicks { get; set; }
         public static long NewInstanceId()
         {
             if (BaseRevertTicks == 0)

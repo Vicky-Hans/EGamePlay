@@ -11,7 +11,8 @@
         public Entity ParentEntity => OwnerAbility.ParentEntity;
         public TriggerConfig TriggerConfig { get; set; }
         public string ConditionParamValue { get; set; }
-        public override void Awake(object initData)
+
+        protected override void Awake(object initData)
         {
             TriggerConfig = initData as TriggerConfig;
             if (TriggerConfig is { StateCheckList: { Count: > 0 } }) AddComponent<TriggerStateCheckComponent>();

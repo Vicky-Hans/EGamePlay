@@ -11,7 +11,7 @@ namespace EGamePlay.Combat
         public bool Enable { get; set; }
 
 
-        public override void Awake()
+        protected override void Awake()
         {
             OwnerEntity.ListenActionPoint(ActionPointType.PreReceiveAttackEffect, TryBlock);
         }

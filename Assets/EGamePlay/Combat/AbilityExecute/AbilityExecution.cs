@@ -42,7 +42,7 @@ namespace EGamePlay.Combat
         public bool ActionOccupy { get; set; } = true;
 
 
-        public override void Awake(object initData)
+        protected override void Awake(object initData)
         {
             AbilityEntity = initData as Ability;
             OwnerEntity = GetParent<CombatEntity>();

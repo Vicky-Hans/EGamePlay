@@ -4,7 +4,7 @@ using EGamePlay.Combat;
 
 public class CombatRunFlow : WorkFlow
 {
-    public override void Awake()
+    protected override void Awake()
     {
         CombatContext.Instance.Subscribe<CombatEndEvent>((x) => { Finish(); });
     }

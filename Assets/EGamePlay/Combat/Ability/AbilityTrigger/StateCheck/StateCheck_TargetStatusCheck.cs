@@ -8,7 +8,8 @@
         public CombatEntity OwnerBattler => Parent.GetParent<AbilityEffect>().OwnerEntity;
         private string AffectCheck { get; set; }
         public bool IsInvert => AffectCheck.StartsWith("!");
-        public override void Awake(object initData)
+
+        protected override void Awake(object initData)
         {
             AffectCheck = initData.ToString().ToLower();
         }

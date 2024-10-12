@@ -5,7 +5,8 @@ using UnityEngine;
 public class CombatCreateFlow : WorkFlow
 {
     private GameObject CombatRootClone { get; set; }
-    public override void Awake()
+
+    protected override void Awake()
     {
         var combatRoot = GameObject.Find("CombatRoot");
         CombatRootClone = Object.Instantiate(combatRoot);

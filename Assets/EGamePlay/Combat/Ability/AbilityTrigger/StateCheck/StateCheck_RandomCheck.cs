@@ -11,7 +11,7 @@ namespace EGamePlay.Combat
         public bool IsInvert => AffectCheck.StartsWith("!");
 
 
-        public override void Awake(object initData)
+        protected override void Awake(object initData)
         {
             AffectCheck = initData.ToString().ToLower();
         }

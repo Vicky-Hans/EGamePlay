@@ -39,7 +39,7 @@ namespace EGamePlay.Combat
 #endif
 
 
-        public override void Awake(object initData)
+        protected override void Awake(object initData)
         {
             AbilityExecution = initData as IAbilityExecute;
             AbilityEntity = AbilityExecution.AbilityEntity;
@@ -82,7 +82,7 @@ namespace EGamePlay.Combat
             Destroy(this);
         }
 
-        public override void OnDestroy()
+        protected override void OnDestroy()
         {
             var clipData = GetComponent<AbilityItemCollisionExecuteComponent>().ExecuteClipData;
             var actionEvenData = GetComponent<AbilityItemCollisionExecuteComponent>().GetItemEffect<ActionEventEffect>();

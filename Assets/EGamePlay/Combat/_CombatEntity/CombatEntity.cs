@@ -47,8 +47,8 @@ namespace EGamePlay.Combat
         public ActionControlType ActionControlType { get; set; }
         /// 禁制豁免
         public ActionControlType ActionControlImmuneType { get; set; }
-        
-        public override void Awake()
+
+        protected override void Awake()
         {
             AddComponent<AttributeComponent>().InitializeCharacter();
             AddComponent<ActionPointComponent>();

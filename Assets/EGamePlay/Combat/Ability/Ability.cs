@@ -18,7 +18,8 @@ namespace EGamePlay.Combat
         public ExecutionObject ExecutionObject { get; set; }
         private bool IsBuff => Config.Type == "Buff";
         private bool IsSkill => !IsBuff;
-        public override void Awake(object initData)
+
+        protected override void Awake(object initData)
         {
             base.Awake(initData);
             ConfigObject = initData as AbilityConfigObject;

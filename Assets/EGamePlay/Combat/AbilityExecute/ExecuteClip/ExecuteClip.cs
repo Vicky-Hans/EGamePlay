@@ -18,7 +18,7 @@ namespace EGamePlay.Combat
         public AbilityExecution ParentExecution => GetParent<AbilityExecution>();
 
 
-        public override void Awake(object initData)
+        protected override void Awake(object initData)
         {
             ExecutionEffectConfig = initData as ExecuteClipData;
             Name = ExecutionEffectConfig.GetType().Name;

@@ -1,134 +1,74 @@
 ﻿using System;
 using System.Collections.Generic;
-
-
 namespace EGamePlay
 {
     public class SubscribeSubject : Entity
     {
-        public override void Awake(object initData)
+        protected override void Awake(object initData)
         {
             Name = initData.GetHashCode().ToString();
         }
-
         public SubscribeSubject DisposeWith(Entity entity)
         {
             entity.SetChild(this);
             return this;
         }
     }
-
     public sealed class EventComponent : Component
     {
         public override bool DefaultEnable { get; set; } = false;
-        private Dictionary<Type, List<object>> TypeEvent2ActionLists = new Dictionary<Type, List<object>>();
-        private Dictionary<string, List<object>> FireEvent2ActionLists = new Dictionary<string, List<object>>();
-        public static bool DebugLog { get; set; } = false;
-
-
-        public new T Publish<T>(T TEvent) where T : class
+        private readonly Dictionary<Type, List<object>> typeEvent2ActionLists = new ();
+        private readonly Dictionary<string, List<object>> fireEvent2ActionLists = new ();
+        public new T Publish<T>(T @event) where T : class
         {
-            if (TypeEvent2ActionLists.TryGetValue(typeof(T), out var actionList))
+            if (!typeEvent2ActionLists.TryGetValue(typeof(T), out var actionList)) return @event;
+            var tempList = actionList.ToArray();
+            foreach (Action<T> action in tempList)
             {
-                var tempList = actionList.ToArray();
-                foreach (Action<T> action in tempList)
-                {
-                    action.Invoke(TEvent);
-                }
+                action.Invoke(@event);
             }
-            return TEvent;
+            return @event;
         }
-
         public new SubscribeSubject Subscribe<T>(Action<T> action) where T : class
         {
             var type = typeof(T);
-            if (!TypeEvent2ActionLists.TryGetValue(type, out var actionList))
+            if (!typeEvent2ActionLists.TryGetValue(type, out var actionList))
             {
                 actionList = new List<object>();
-                TypeEvent2ActionLists.Add(type, actionList);
+                typeEvent2ActionLists.Add(type, actionList);
             }
             actionList.Add(action);
             return Entity.AddChild<SubscribeSubject>(action);
         }
-
         public new void UnSubscribe<T>(Action<T> action) where T : class
         {
-            if (TypeEvent2ActionLists.TryGetValue(typeof(T), out var actionList))
-            {
-                actionList.Remove(action);
-            }
+            if (typeEvent2ActionLists.TryGetValue(typeof(T), out var actionList)) actionList.Remove(action);
             var e = Entity.Find<SubscribeSubject>(action.GetHashCode().ToString());
-            if (e != null)
-            {
-                Entity.Destroy(e);
-            }
+            if (e != null) Entity.Destroy(e);
         }
-
         public void FireEvent<T>(string eventType, T entity) where T : Entity
         {
-            if (FireEvent2ActionLists.TryGetValue(eventType, out var actionList))
+            if (!fireEvent2ActionLists.TryGetValue(eventType, out var actionList)) return;
+            var tempList = actionList.ToArray();
+            foreach (Action<T> action in tempList)
             {
-                var tempList = actionList.ToArray();
-                foreach (Action<T> action in tempList)
-                {
-                    action.Invoke(entity);
-                }
+                action.Invoke(entity);
             }
         }
-
         public void OnEvent<T>(string eventType, Action<T> action) where T : Entity
         {
-            if (FireEvent2ActionLists.TryGetValue(eventType, out var actionList))
-            {
-            }
+            if (fireEvent2ActionLists.TryGetValue(eventType, out var actionList))
+            { }
             else
             {
                 actionList = new List<object>();
-                FireEvent2ActionLists.Add(eventType, actionList);
+                fireEvent2ActionLists.Add(eventType, actionList);
             }
             actionList.Add(action);
         }
-
         public void OffEvent<T>(string eventType, Action<T> action) where T : Entity
         {
-            if (FireEvent2ActionLists.TryGetValue(eventType, out var actionList))
-            {
-                actionList.Remove(action);
-            }
+            if (fireEvent2ActionLists.TryGetValue(eventType, out var actionList)) actionList.Remove(action);
         }
     }
 }
-
-
-//public void FireEvent<T>(string eventType, T entity) where T : Entity
-//{
-//    if (FireEvent2ActionLists.TryGetValue(eventType, out var actionList))
-//    {
-//        var tempList = actionList.ToArray();
-//        foreach (Action<T> action in tempList)
-//        {
-//            action.Invoke(entity);
-//        }
-//    }
-//}
-
-//public void OnEvent<T>(string eventType, Action<T> action) where T : Entity
-//{
-//    if (FireEvent2ActionLists.TryGetValue(eventType, out var actionList))
-//    {
-//    }
-//    else
-//    {
-//        actionList = new List<object>();
-//        FireEvent2ActionLists.Add(eventType, actionList);
-//    }
-//    actionList.Add(action);
-//}
-
-//public void OffEvent<T>(string eventType, Action<T> action) where T : Entity
-//{
-//    if (FireEvent2ActionLists.TryGetValue(eventType, out var actionList))
-//    {
-//        actionList.Remove(action);
-//    }
-//}

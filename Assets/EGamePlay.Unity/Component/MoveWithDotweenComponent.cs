@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using UnityEngine;
-using ET;
+﻿using UnityEngine;
 using DG.Tweening;
 using System;
 
@@ -22,49 +18,42 @@ namespace EGamePlay.Combat
 
     public class MoveWithDotweenComponent : Component
     {
-        public SpeedType SpeedType { get; set; }
-        public float Speed { get; set; }
-        public float Duration { get; set; }
-        public float ElapsedTime { get; set; }
-        public IPosition PositionEntity { get; set; }
-        public IPosition TargetPositionEntity { get; set; }
-        public Entity TargetEntity { get; set; }
-        public Vector3 Destination { get; set; }
-        public Tweener MoveTweener { get; set; }
-        private System.Action MoveFinishAction { get; set; }
-
-
+        private SpeedType SpeedType { get; set; }
+        private float Speed { get; set; }
+        private float Duration { get; set; }
+        private float ElapsedTime { get; set; }
+        private IPosition PositionEntity { get; set; }
+        private IPosition TargetPositionEntity { get; set; }
+        private Entity TargetEntity { get; set; }
+        private Vector3 Destination { get; set; }
+        private Tweener MoveTweener { get; set; }
+        private Action MoveFinishAction { get; set; }
         public override void Awake()
         {
             PositionEntity = (IPosition)Entity;
             ElapsedTime = 0;
         }
-
         public override void Update()
         {
-            if (TargetPositionEntity != null)
+            if (TargetPositionEntity == null) return;
+            if (TargetEntity.IsDisposed)
             {
-                if (TargetEntity.IsDisposed)
-                {
-                    TargetEntity = null;
-                    TargetPositionEntity = null;
-                    Entity.Destroy(Entity);
-                    return;
-                }
-                if (SpeedType == SpeedType.Speed) DoMoveToWithSpeed(TargetPositionEntity, Speed);
-                if (SpeedType == SpeedType.Duration) DoTimeMove(MathF.Max(0, Duration - ElapsedTime));
-                ElapsedTime += Time.deltaTime;
+                TargetEntity = null;
+                TargetPositionEntity = null;
+                Entity.Destroy(Entity);
+                return;
             }
+            if (SpeedType == SpeedType.Speed) DoMoveToWithSpeed(TargetPositionEntity, Speed);
+            if (SpeedType == SpeedType.Duration) DoTimeMove(MathF.Max(0, Duration - ElapsedTime));
+            ElapsedTime += Time.deltaTime;
         }
-
         public MoveWithDotweenComponent DoMoveTo(Vector3 destination, float duration)
         {
             Destination = destination;
-            DOTween.To(()=> { return PositionEntity.Position; }, (x) => PositionEntity.Position = x, Destination, duration).SetEase(Ease.Linear).OnComplete(OnMoveFinish);
+            DOTween.To(()=> PositionEntity.Position, x => PositionEntity.Position = x, Destination, duration).SetEase(Ease.Linear).OnComplete(OnMoveFinish);
             return this;
         }
-
-        public void DoMoveToWithSpeed(IPosition targetPositionEntity, float speed = 1f)
+        private void DoMoveToWithSpeed(IPosition targetPositionEntity, float speed = 1f)
         {
             Speed = speed;
             SpeedType = SpeedType.Speed;
@@ -73,9 +62,8 @@ namespace EGamePlay.Combat
             MoveTweener?.Kill();
             var dist = Vector3.Distance(PositionEntity.Position, TargetPositionEntity.Position);
             var duration = dist / speed;
-            MoveTweener = DOTween.To(() => { return PositionEntity.Position; }, (x) => PositionEntity.Position = x, TargetPositionEntity.Position, duration);
+            MoveTweener = DOTween.To(() => PositionEntity.Position, x => PositionEntity.Position = x, TargetPositionEntity.Position, duration);
         }
-
         public void DoMoveToWithTime(IPosition targetPositionEntity, float time = 1f)
         {
             Duration = time;
@@ -84,28 +72,16 @@ namespace EGamePlay.Combat
             TargetEntity = targetPositionEntity as Entity;
             DoTimeMove(time);
         }
-
         private void DoTimeMove(float time)
         {
             MoveTweener?.Kill();
-            MoveTweener = DOTween.To(() => { return PositionEntity.Position; }, (x) => PositionEntity.Position = x, TargetPositionEntity.Position, time);
+            MoveTweener = DOTween.To(() => PositionEntity.Position, x => PositionEntity.Position = x, TargetPositionEntity.Position, time);
             MoveTweener.SetEase(Ease.Linear);
         }
-
-        //public void DoMovePath(List<Vector3> points)
-        //{
-        //    TargetPositionEntity = targetPositionEntity;
-        //    MoveTweener?.Kill();
-        //    var dist = Vector3.Distance(PositionEntity.Position, TargetPositionEntity.Position);
-        //    var duration = dist / 10;
-        //    MoveTweener = DOTween.To(() => { return PositionEntity.Position; }, (x) => PositionEntity.Position = x, TargetPositionEntity.Position, duration);
-        //}
-
-        public void OnMoveFinish(System.Action action)
+        public void OnMoveFinish(Action action)
         {
             MoveFinishAction = action;
         }
-
         private void OnMoveFinish()
         {
             MoveFinishAction?.Invoke();

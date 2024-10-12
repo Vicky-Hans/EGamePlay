@@ -14,7 +14,7 @@ namespace EGamePlay.Combat
         public bool Enable { get; set; }
 
 
-        public override void Awake()
+        protected override void Awake()
         {
             AddComponent<DamageBloodSuckComponent>();
         }

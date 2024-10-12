@@ -11,7 +11,8 @@ namespace ET
 	public class OnceWaitTimer: Entity, ITimer
 	{
 		private ETTaskCompletionSource<bool> Callback { get; set; }
-        public override void Awake(object initData)
+
+		protected override void Awake(object initData)
         {
 			Callback = initData as ETTaskCompletionSource<bool>;
 		}
@@ -26,7 +27,8 @@ namespace ET
 	public class OnceTimer: Entity, ITimer
 	{
 		private Action<bool> Callback { get; set; }
-		public override void Awake(object initData)
+
+		protected override void Awake(object initData)
 		{
 			Callback = initData as Action<bool>;
 		}
@@ -51,7 +53,7 @@ namespace ET
 
 	public class RepeatedTimer: Entity, ITimer
 	{
-		public override void Awake(object initData)
+		protected override void Awake(object initData)
 		{
 			var awakeData = initData as RepeatedTimerAwakeData;
 			StartTime = TimeHelper.ClientNow();
@@ -82,7 +84,8 @@ namespace ET
 				Log.Error(e);
 			}
 		}
-		public override void OnDestroy()
+
+		protected override void OnDestroy()
 		{
 			if (IsDisposed) return;
 			var id = Id;
@@ -109,7 +112,8 @@ namespace ET
 		private readonly Queue<long> timeOutTimerIds = new ();
 		// 记录最小时间，不用每次都去MultiMap取第一个值
 		private long minTime;
-        public override void Awake()
+
+		protected override void Awake()
         {
 			Instance = this;
         }

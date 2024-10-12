@@ -23,7 +23,8 @@
         public CombatEntity OwnerEntity => OwnerAbility.OwnerEntity;
         public Entity ParentEntity => OwnerAbility.ParentEntity;
         public Effect EffectConfig { get; set; }
-        public override void Awake(object initData)
+
+        protected override void Awake(object initData)
         {
             EffectConfig = initData as Effect;
             Name = EffectConfig.GetType().Name;
@@ -45,7 +46,8 @@
             var decorators = this.EffectConfig.Decorators;
             if (decorators != null && decorators.Count > 0) AddComponent<EffectDecoratosComponent>();
         }
-        public override void OnDestroy()
+
+        protected override void OnDestroy()
         {
             DisableEffect();
         }

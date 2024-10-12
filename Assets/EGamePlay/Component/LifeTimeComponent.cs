@@ -1,24 +1,17 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using GameUtils;
 
 namespace EGamePlay
 {
-    /// <summary>
-    /// 生命周期组件
-    /// </summary>
+    //生命周期组件
     public class LifeTimeComponent : Component
     {
         public override bool DefaultEnable { get; set; } = true;
-        public GameTimer LifeTimer { get; set; }
-
-
+        private GameTimer LifeTimer { get; set; }
         public override void Awake(object initData)
         {
             LifeTimer = new GameTimer((float)initData);
         }
-
         public override void Update()
         {
             if (LifeTimer.IsRunning)
@@ -26,7 +19,6 @@ namespace EGamePlay
                 LifeTimer.UpdateAsFinish(Time.deltaTime, DestroyEntity);
             }
         }
-
         private void DestroyEntity()
         {
             Entity.Destroy(Entity);

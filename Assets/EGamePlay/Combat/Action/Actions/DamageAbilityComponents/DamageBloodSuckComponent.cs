@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-
-namespace EGamePlay.Combat
+﻿namespace EGamePlay.Combat
 {
     /// <summary>
     /// 伤害吸血组件
@@ -16,23 +10,17 @@ namespace EGamePlay.Combat
             var combatEntity = Entity.GetParent<CombatEntity>();
             combatEntity.ListenActionPoint(ActionPointType.PostCauseDamage, OnCauseDamage);
         }
-
         private void OnCauseDamage(Entity action)
         {
-            var damageAction = action as DamageAction;
-            if (damageAction.Target is CombatEntity target)
-            {
-                var value = damageAction.DamageValue * 0.2f;
-                var combatEntity = Entity.GetParent<CombatEntity>();
-                if (combatEntity.CureAbility.TryMakeAction(out var cureAction))
-                {
-                    cureAction.Creator = combatEntity;
-                    cureAction.Target = combatEntity;
-                    cureAction.CureValue = (int)value;
-                    cureAction.SourceAssignAction = null;
-                    cureAction.ApplyCure();
-                }
-            }
+            if (action is not DamageAction { Target: CombatEntity } damageAction) return;
+            var value = damageAction.DamageValue * 0.2f;
+            var combatEntity = Entity.GetParent<CombatEntity>();
+            if (!combatEntity.CureAbility.TryMakeAction(out var cureAction)) return;
+            cureAction.Creator = combatEntity;
+            cureAction.Target = combatEntity;
+            cureAction.CureValue = (int)value;
+            cureAction.SourceAssignAction = null;
+            cureAction.ApplyCure();
         }
     }
 }

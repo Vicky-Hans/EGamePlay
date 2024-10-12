@@ -59,7 +59,8 @@ namespace EGamePlay.Combat
         public float finalPctAdd { get; private set; }
         private Dictionary<int, FloatModifierCollection> TypeModifierCollections { get; } = new ();
         public AttributeType AttributeType { get; set; }
-        public override void Awake()
+
+        protected override void Awake()
         {
             baseValue = add = pctAdd = finalAdd = finalPctAdd = 0f;
             TypeModifierCollections.Add(((int)ModifierType.Add), new FloatModifierCollection());
