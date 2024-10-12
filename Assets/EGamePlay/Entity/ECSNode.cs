@@ -13,26 +13,19 @@ namespace EGamePlay
         {
             if (Instance != null) return Instance;
             Instance = new ECSNode();
-#if !NOT_UNITY
             Instance.AddComponent<GameObjectComponent>();
             UnityEngine.Object.DontDestroyOnLoad(Instance.GetComponent<GameObjectComponent>().GameObject);
-#endif
             return Instance;
         }
-
         public static void Destroy()
         {
             Destroy(Instance);
             Instance = null;
         }
-
         public override void Update()
         {
-            if (AllComponents.Count == 0)
-            {
-                return;
-            }
-            for (int i = AllComponents.Count - 1; i >= 0; i--)
+            if (AllComponents.Count == 0) return;
+            for (var i = AllComponents.Count - 1; i >= 0; i--)
             {
                 var item = AllComponents[i];
                 if (item.IsDisposed)
@@ -40,10 +33,7 @@ namespace EGamePlay
                     AllComponents.RemoveAt(i);
                     continue;
                 }
-                if (item.Disable)
-                {
-                    continue;
-                }
+                if (item.Disable) continue;
                 item.Update();
             }
         }

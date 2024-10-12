@@ -1,9 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 using GameUtils;
-
 namespace EGamePlay.Combat
 {
     /// <summary>
@@ -15,27 +11,21 @@ namespace EGamePlay.Combat
         public float StartTime { get; set; }
         public float EndTime { get; set; }
         public string TimeValueExpression { get; set; }
-        public GameTimer StartTimer { get; set; }
-        public GameTimer EndTimer { get; set; }
-
-
+        private GameTimer StartTimer { get; set; }
+        private GameTimer EndTimer { get; set; }
         public override void Update()
         {
-            if (StartTimer != null && StartTimer.IsFinished == false)
+            if (StartTimer is { IsFinished: false })
             {
                 StartTimer.UpdateAsFinish(Time.deltaTime, GetEntity<ExecuteClip>().TriggerEffect);
-                //Log.Debug($"ExecuteTimeTriggerComponent {StartTimer.Time} {StartTimer.MaxTime}");
             }
-            if (EndTimer != null && EndTimer.IsFinished == false)
+            if (EndTimer is { IsFinished: false })
             {
                 EndTimer.UpdateAsFinish(Time.deltaTime, GetEntity<ExecuteClip>().EndEffect);
             }
         }
-
         protected override void OnEnable()
         {
-            //Log.Debug($"ExecutionTimeTriggerComponent OnEnable {TimeValueExpression} {StartTime} {EndTime}");
-
             if (!string.IsNullOrEmpty(TimeValueExpression))
             {
                 var expression = ExpressionHelper.TryEvaluate(TimeValueExpression);
@@ -50,11 +40,7 @@ namespace EGamePlay.Combat
             {
                 GetEntity<ExecuteClip>().TriggerEffect();
             }
-
-            if (EndTime > 0)
-            {
-                EndTimer = new GameTimer(EndTime);
-            }
+            if (EndTime > 0) EndTimer = new GameTimer(EndTime);
         }
     }
 }

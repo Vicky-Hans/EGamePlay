@@ -2,10 +2,8 @@
 
 public class WorkFlowSource : Entity
 {
-    public WorkFlow CurrentWorkFlow { get; private set; }
+    private WorkFlow CurrentWorkFlow { get; set; }
     public WorkFlow PostWorkFlow { get; private set; }
-
-
     public WorkFlow ToEnter<T>() where T : WorkFlow
     {
         var workflow = AddChild<T>();
@@ -13,16 +11,13 @@ public class WorkFlowSource : Entity
         workflow.FlowSource = this;
         return workflow;
     }
-
     public void Startup()
     {
         CurrentWorkFlow = PostWorkFlow;
         CurrentWorkFlow.Startup();
     }
-
     public void OnFlowFinish()
     {
-        //Log.Debug(($"{GetType().Name}->OnFlowFinish {CurrentWorkFlow.GetType().Name} {CurrentWorkFlow.PostWorkFlow}"));
         CurrentWorkFlow = CurrentWorkFlow.PostWorkFlow;
         CurrentWorkFlow.Startup();
     }

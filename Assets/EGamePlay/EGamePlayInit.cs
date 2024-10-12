@@ -11,7 +11,6 @@ public class EGamePlayInit : SerializedMonoBehaviour
     public static EGamePlayInit Instance { get; private set; }
     public ReferenceCollector ConfigsCollector;
     public bool EntityLog;
-
 #if !EGAMEPLAY_ET
     private void Awake()
     {

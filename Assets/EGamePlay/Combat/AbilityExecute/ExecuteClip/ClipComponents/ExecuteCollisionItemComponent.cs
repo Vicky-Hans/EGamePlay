@@ -1,35 +1,20 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-
-namespace EGamePlay.Combat
+﻿namespace EGamePlay.Combat
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public class ExecuteCollisionItemComponent : Component
     {
         public ItemExecute CollisionExecuteData { get; set; }
-
-
         public override void Awake()
         {
             Entity.OnEvent(nameof(ExecuteClip.TriggerEffect), OnTriggerExecutionEffect);
             Entity.OnEvent(nameof(ExecuteClip.EndEffect), OnTriggerEnd);
         }
-
-        public void OnTriggerExecutionEffect(Entity entity)
+        private void OnTriggerExecutionEffect(Entity entity)
         {
-            //Log.Debug("ExecutionSpawnCollisionComponent OnTriggerExecutionEffect");
             SpawnCollisionItem(GetEntity<ExecuteClip>().ExecutionEffectConfig);
         }
-
-        /// <summary>   技能碰撞体生成   </summary>
-        public void SpawnCollisionItem(ExecuteClipData clipData)
+        //技能碰撞体生成
+        private void SpawnCollisionItem(ExecuteClipData clipData)
         {
-            //Log.Console($"ExecuteCollisionItemComponent SpawnCollisionItem {clipData.CollisionExecuteData.MoveType}");
-
             var skillExecution = Entity.GetParent<AbilityExecution>();
             var abilityItem = Entity.Create<AbilityItem>(skillExecution);
             abilityItem.AddComponent<AbilityItemCollisionExecuteComponent>(clipData);
@@ -50,11 +35,6 @@ namespace EGamePlay.Combat
 #endif
 #endif
         }
-
-        public void OnTriggerEnd(Entity entity)
-        {
-            //Log.Debug("ExecutionAnimationComponent OnTriggerExecutionEffect");
-            //Entity.GetParent<SkillExecution>().OwnerEntity.Publish(AnimationClip);
-        }
+        private void OnTriggerEnd(Entity entity) { }
     }
 }

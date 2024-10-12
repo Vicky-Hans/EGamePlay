@@ -1,11 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using EGamePlay.Combat;
 using ET;
-using Log = EGamePlay.Log;
-using System;
 
 #if EGAMEPLAY_ET
 using Unity.Mathematics;

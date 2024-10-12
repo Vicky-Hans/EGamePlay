@@ -6,6 +6,7 @@ using ET;
 using GameUtils;
 using System;
 using static UnityEngine.GraphicsBuffer;
+using Object = UnityEngine.Object;
 
 
 #if EGAMEPLAY_ET
@@ -353,7 +354,7 @@ namespace EGamePlay.Combat
             abilityItem.GetComponent<AbilityItemViewComponent>().AbilityItemTrans = proxyObj.transform;
             var executeComp = abilityItem.GetComponent<AbilityItemCollisionExecuteComponent>();
             var itemData = executeComp.CollisionExecuteData;
-            CollisionEffect collisionData = executeComp.GetItemEffect<CollisionEffect>();
+            var collisionData = executeComp.GetItemEffect<CollisionEffect>();
             ItemProxy = abilityItem.GetComponent<AbilityItemViewComponent>();
             CombatContext.Instance.Object2Items[proxyObj.gameObject] = abilityItem;
 
@@ -370,8 +371,6 @@ namespace EGamePlay.Combat
                 proxyObj.GetComponent<BoxCollider>().center = collisionData.Center;
                 proxyObj.GetComponent<BoxCollider>().size = collisionData.Size;
             }
-
-            //Log.Debug($"CreateAbilityItemProxyObj ActionEventType {clipData.ActionData.ActionEventType}");
             if (abilityItem.GetComponent<AbilityItemShieldComponent>() != null)
             {
                 var rigid = proxyObj.AddComponent<Rigidbody>();
@@ -381,12 +380,9 @@ namespace EGamePlay.Combat
             }
             else
             {
-                proxyObj.AddComponent<OnTriggerEnterCallback>().OnTriggerEnterCallbackAction = (other) =>
+                proxyObj.AddComponent<OnTriggerEnterCallback>().OnTriggerEnterCallbackAction = other =>
                 {
-                    if (abilityItem.IsDisposed)
-                    {
-                        return;
-                    }
+                    if (abilityItem.IsDisposed) return;
                     var owner = abilityItem.AbilityEntity.OwnerEntity;
                     Entity target = null;
                     if (CombatContext.Instance.Object2Entities.TryGetValue(other.gameObject, out var otherEntity))
@@ -400,46 +396,29 @@ namespace EGamePlay.Combat
                             target = otherItem;
                         }
                     }
-
                     if (collisionData.ExecuteTargetType == CollisionExecuteTargetType.SelfGroup)
                     {
-                        if (otherEntity.IsHero != owner.IsHero)
-                        {
-                            return;
-                        }
+                        if (otherEntity != null && otherEntity.IsHero != owner.IsHero) return;
                     }
                     if (collisionData.ExecuteTargetType == CollisionExecuteTargetType.EnemyGroup)
                     {
-                        if (otherEntity.IsHero == owner.IsHero)
-                        {
-                            return;
-                        }
+                        if (otherEntity != null && otherEntity.IsHero == owner.IsHero) return;
                     }
-
-                    if (owner.CollisionAbility.TryMakeAction(out var collisionAction))
-                    {
-                        collisionAction.Creator = owner;
-                        collisionAction.CauseItem = abilityItem;
-                        collisionAction.Target = target;
-                        collisionAction.ApplyCollision();
-                    }
+                    if (!owner.CollisionAbility.TryMakeAction(out var collisionAction)) return;
+                    collisionAction.Creator = owner;
+                    collisionAction.CauseItem = abilityItem;
+                    collisionAction.Target = target;
+                    collisionAction.ApplyCollision();
                 };
             }
 
             var collider = proxyObj.GetComponent<Collider>();
-            if (collider != null)
-            {
-                collider.enabled = true;
-            }
-
-            if (itemData.ObjAsset != null)
-            {
-                abilityItem.Name = itemData.ObjAsset.name;
-                var effectObj = GameObject.Instantiate(itemData.ObjAsset, proxyObj.transform);
-                effectObj.transform.localPosition = Vector3.zero;
-                effectObj.transform.localRotation = UnityEngine.Quaternion.identity;
-            }
-
+            if (collider != null) collider.enabled = true;
+            if (itemData.ObjAsset == null) return proxyObj;
+            abilityItem.Name = itemData.ObjAsset.name;
+            var effectObj = Object.Instantiate(itemData.ObjAsset, proxyObj.transform);
+            effectObj.transform.localPosition = Vector3.zero;
+            effectObj.transform.localRotation = Quaternion.identity;
             return proxyObj;
         }
 #endif

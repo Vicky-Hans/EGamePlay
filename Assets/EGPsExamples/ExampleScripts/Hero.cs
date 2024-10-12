@@ -34,9 +34,6 @@ public sealed class Hero : MonoBehaviour
     public Vector3 Position { get; set; }
     public Vector3 Rotation { get; set; }
     public bool SkillPlaying { get; set; }
-
-
-    // Start is called before the first frame update
     void Start()
     {
         Instance = this;
@@ -105,58 +102,6 @@ public sealed class Hero : MonoBehaviour
             ExecutionLinkPanelObj.GetComponent<ExecutionLinkPanel>().HeroEntity = CombatEntity;
         }
     }
-
-    //private void InitInventory()
-    //{
-    //    if (InventoryPanelTrm != null)
-    //    {
-    //        for (int i = InventoryPanelTrm.childCount; i > 0; i--)
-    //        {
-    //            GameObject.Destroy(InventoryPanelTrm.GetChild(i - 1).gameObject);
-    //        }
-    //        var allItemConfigs = ConfigHelper.GetAll<EquipmentConfig>();
-    //        foreach (var item in allItemConfigs)
-    //        {
-    //            var itemObj = GameObject.Instantiate(ItemPrefab);
-    //            itemObj.transform.parent = InventoryPanelTrm;
-    //            itemObj.transform.Find("Icon").GetComponent<UnityEngine.UI.Image>().sprite = Resources.Load<Sprite>($"Icons/{item.Value.Name}");
-    //            var text = itemObj.transform.Find("Text").GetComponent<UnityEngine.UI.Text>();
-    //            text.text = $"+{item.Value.Value}";
-    //            if (item.Value.Attribute == "AttackPower")
-    //            {
-    //                text.color = Color.red;
-    //            }
-    //            itemObj.GetComponent<UnityEngine.UI.Button>().onClick.AddListener((UnityEngine.Events.UnityAction)(() =>
-    //            {
-    //                if (EquipmentPanelTrm.childCount >= 4)
-    //                {
-    //                    return;
-    //                }
-    //                var equipObj = GameObject.Instantiate(ItemPrefab);
-    //                equipObj.transform.parent = EquipmentPanelTrm;
-    //                equipObj.transform.Find("Icon").GetComponent<UnityEngine.UI.Image>().sprite = Resources.Load<Sprite>($"Icons/{item.Value.Name}");
-    //                var equipText = equipObj.transform.Find("Text").GetComponent<UnityEngine.UI.Text>();
-    //                equipText.text = $"+{item.Value.Value}";
-    //                if (item.Value.Attribute == "AttackPower")
-    //                {
-    //                    equipText.color = Color.red;
-    //                }
-    //                var itemData = CombatEntity.AddChild<ItemData>();
-    //                equipObj.name = $"{itemData.Id}";
-    //                itemData.ConfigId = (short)item.Value.Id;
-    //                CombatEntity.GetComponent<EquipmentComponent>().AddItemData(itemData);
-    //                equipObj.GetComponent<UnityEngine.UI.Button>().onClick.AddListener((UnityEngine.Events.UnityAction)(() =>
-    //                {
-    //                    var id = long.Parse(equipObj.name);
-    //                    CombatEntity.GetComponent<EquipmentComponent>().RemoveItemData(id);
-    //                    GameObject.Destroy(equipObj);
-    //                }));
-    //            }));
-    //        }
-    //    }
-    //}
-
-    // Update is called once per frame
     void Update()
     {
         CombatEntity.Position = transform.position;

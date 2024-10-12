@@ -28,11 +28,9 @@ namespace EGamePlay
         public Dictionary<Type, Component> Components { get; set; } = new ();
         protected Entity()
         {
-#if !NOT_UNITY
             if (this is ECSNode) { }
             else if (GetType().Name.Contains("OnceWaitTimer")) { }
             else AddComponent<GameObjectComponent>();
-#endif
         }
         protected virtual void Awake() { }
         protected virtual void Awake(object initData) { }
@@ -315,6 +313,7 @@ namespace EGamePlay
             eventComponent?.OffEvent(eventType, action);
         }
         #endregion
+        #region EntityCreate
         private static ECSNode EcsNode => ECSNode.Instance;
         public static bool EnableLog { get; set; }
         private static Entity NewEntity(Type entityType, long id = 0)
@@ -377,5 +376,7 @@ namespace EGamePlay
             }
             entity.Dispose();
         }
+        #endregion
+        
     }
 }

@@ -57,8 +57,7 @@ namespace EGamePlay
         }
         public void OnEvent<T>(string eventType, Action<T> action) where T : Entity
         {
-            if (fireEvent2ActionLists.TryGetValue(eventType, out var actionList))
-            { }
+            if (fireEvent2ActionLists.TryGetValue(eventType, out var actionList)) { }
             else
             {
                 actionList = new List<object>();

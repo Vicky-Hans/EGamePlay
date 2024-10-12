@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace EGamePlay.Combat
+﻿namespace EGamePlay.Combat
 {
     public class ExecuteEffectEvent
     {
@@ -16,50 +12,47 @@ namespace EGamePlay.Combat
     {
         public ExecuteClipData ExecutionEffectConfig { get; set; }
         public AbilityExecution ParentExecution => GetParent<AbilityExecution>();
-
-
         protected override void Awake(object initData)
         {
             ExecutionEffectConfig = initData as ExecuteClipData;
+            if (ExecutionEffectConfig == null) return;
             Name = ExecutionEffectConfig.GetType().Name;
-
             var clipType = ExecutionEffectConfig.ExecuteClipType;
             if (clipType == ExecuteClipType.ActionEvent)
             {
                 var spawnItemEffect = ExecutionEffectConfig.ActionEventData;
-                /// 应用效果给目标效果
+                //应用效果给目标效果
                 if (spawnItemEffect.ActionEventType == FireEventType.AssignEffect)
                 {
                     AddComponent<ExecuteAssignEffectToTargetComponent>().ExecuteTriggerType = spawnItemEffect.ExecuteTrigger;
                 }
-                /// 触发新的执行体效果
+                //触发新的执行体效果
                 if (spawnItemEffect.ActionEventType == FireEventType.TriggerNewExecution)
                 {
                     AddComponent<ExecuteTriggerNewExecutionComponent>().ActionEventData = spawnItemEffect;
                 }
             }
-            /// 生成碰撞体效果，碰撞体再触发应用能力效果
+            //生成碰撞体效果，碰撞体再触发应用能力效果
             if (clipType == ExecuteClipType.ItemExecute)
             {
                 var spawnItemEffect = ExecutionEffectConfig.ItemData;
                 AddComponent<ExecuteCollisionItemComponent>().CollisionExecuteData = spawnItemEffect;
             }
 #if UNITY
-            /// 播放动作效果
+            //播放动作效果
             if (clipType == ExecuteClipType.Animation)
             {
                 var animationEffect = ExecutionEffectConfig.AnimationData;
                 AddComponent<ExecuteAnimationComponent>().AnimationClip = animationEffect.AnimationClip;
             }
-            /// 播放特效效果
+            //播放特效效果
             if (clipType == ExecuteClipType.ParticleEffect)
             {
                 var animationEffect = ExecutionEffectConfig.ParticleEffectData;
                 AddComponent<ExecuteParticleEffectComponent>().ParticleEffectPrefab = animationEffect.ParticleEffect;
             }
 #endif
-
-            /// 时间到触发执行效果
+            //时间到触发执行效果
             if (clipType == ExecuteClipType.ActionEvent)
             {
                 AddComponent<ExecuteTimeTriggerComponent>().StartTime = (float)ExecutionEffectConfig.StartTime;
@@ -70,31 +63,22 @@ namespace EGamePlay.Combat
                 GetComponent<ExecuteTimeTriggerComponent>().EndTime = (float)ExecutionEffectConfig.EndTime;
             }
         }
-
         public void BeginExecute()
         {
-            if (!TryGet(out ExecuteTimeTriggerComponent timeTriggerComponent))
-            {
-                TriggerEffect();
-            }
+            if (!TryGet(out ExecuteTimeTriggerComponent timeTriggerComponent)) TriggerEffect();
             foreach (var item in Components.Values)
             {
                 item.Enable = true;
             }
         }
-
         public void TriggerEffect()
         {
-            //Log.Debug($"ExecutionEffect ApplyEffect");
-            this.Publish(new ExecuteEffectEvent() { ExecutionEffect = this });
-            this.FireEvent(nameof(TriggerEffect));
+            Publish(new ExecuteEffectEvent{ ExecutionEffect = this });
+            FireEvent(nameof(TriggerEffect));
         }
-
         public void EndEffect()
         {
-            //Log.Debug($"ExecutionEffect ApplyEffect");
-            //this.Publish(new ExecuteEffectEvent() { ExecutionEffect = this });
-            this.FireEvent(nameof(EndEffect));
+            FireEvent(nameof(EndEffect));
         }
     }
 }

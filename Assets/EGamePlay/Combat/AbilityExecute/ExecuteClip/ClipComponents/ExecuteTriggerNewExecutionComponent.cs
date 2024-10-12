@@ -1,32 +1,17 @@
-﻿using ET;
-using GameUtils;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-
+﻿using GameUtils;
 namespace EGamePlay.Combat
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public class ExecuteTriggerNewExecutionComponent : Component
     {
         public ActionEventData ActionEventData { get; set; }
-
-
         public override void Awake()
         {
             Entity.Subscribe<ExecuteEffectEvent>(OnTriggerExecutionEffect);
         }
-
-        public void OnTriggerExecutionEffect(ExecuteEffectEvent evnt)
+        private void OnTriggerExecutionEffect(ExecuteEffectEvent evnt)
         {
             var executionObject = AssetUtils.LoadObject<ExecutionObject>($"{AbilityManagerObject.ExecutionResFolder}/" + ActionEventData.NewExecution);
-            if (executionObject == null)
-            {
-                return;
-            }
+            if (executionObject == null) return;
             var sourceExecution = Entity.GetParent<AbilityExecution>();
             var execution = sourceExecution.OwnerEntity.AddChild<AbilityExecution>(sourceExecution.SkillAbility);
             execution.ExecutionObject = executionObject;
@@ -34,10 +19,7 @@ namespace EGamePlay.Combat
             execution.InputPoint = sourceExecution.InputPoint;
             execution.LoadExecutionEffects();
             execution.BeginExecute();
-            if (executionObject != null)
-            {
-                execution.AddComponent<UpdateComponent>();
-            }
+            if (executionObject != null) execution.AddComponent<UpdateComponent>();
         }
     }
 }

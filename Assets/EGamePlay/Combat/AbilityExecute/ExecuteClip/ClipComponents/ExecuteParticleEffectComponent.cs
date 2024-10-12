@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 #if EGAMEPLAY_ET
 using Unity.Mathematics;
 #endif
@@ -9,33 +6,27 @@ using Unity.Mathematics;
 #if UNITY
 namespace EGamePlay.Combat
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public class ExecuteParticleEffectComponent : Component
     {
         public GameObject ParticleEffectPrefab { get; set; }
-        public GameObject ParticleEffectObj { get; set; }
-
-
+        private GameObject ParticleEffectObj { get; set; }
         public override void Awake()
         {
             Entity.OnEvent(nameof(ExecuteClip.TriggerEffect), OnTriggerStart);
             Entity.OnEvent(nameof(ExecuteClip.EndEffect), OnTriggerEnd);
         }
 
-        public void OnTriggerStart(Entity entity)
+        private void OnTriggerStart(Entity entity)
         {
 #if EGAMEPLAY_ET
             ParticleEffectObj = GameObject.Instantiate(ParticleEffectPrefab, Entity.GetParent<SkillExecution>().OwnerEntity.Position, Entity.GetParent<SkillExecution>().OwnerEntity.Rotation);
 #else
-            ParticleEffectObj = GameObject.Instantiate(ParticleEffectPrefab, Entity.GetParent<AbilityExecution>().OwnerEntity.Position, Entity.GetParent<AbilityExecution>().OwnerEntity.Rotation);
+            ParticleEffectObj = Object.Instantiate(ParticleEffectPrefab, Entity.GetParent<AbilityExecution>().OwnerEntity.Position, Entity.GetParent<AbilityExecution>().OwnerEntity.Rotation);
 #endif
         }
-
-        public void OnTriggerEnd(Entity entity)
+        private void OnTriggerEnd(Entity entity)
         {
-            GameObject.Destroy(ParticleEffectObj);
+            Object.Destroy(ParticleEffectObj);
         }
     }
 }
